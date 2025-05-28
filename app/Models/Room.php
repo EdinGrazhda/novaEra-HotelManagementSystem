@@ -15,6 +15,8 @@ class Room extends Model
         'room_status',
         'room_description',
         'room_category_id',
+        'cleaning_status',
+        'cleaning_notes',
     ];
 
     public function roomCategory()
