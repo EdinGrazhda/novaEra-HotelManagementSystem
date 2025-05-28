@@ -1,0 +1,101 @@
+.room-box {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.room-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Search input styles */
+#room-search {
+    transition: all 0.2s ease-in-out;
+}
+
+#room-search:focus {
+    box-shadow: 0 0 0 3px rgba(248, 184, 3, 0.3);
+}
+
+/* Clear search button styles */
+#clear-search {
+    cursor: pointer;
+    transition: opacity 0.2s ease-in-out;
+    opacity: 0.7;
+}
+
+#clear-search:hover {
+    opacity: 1;
+}
+
+@media (max-width: 640px) {
+    .filter-btn {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.5rem;
+    }
+}
+
+.room-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.room-number::before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 8px;
+    border-radius: 50%;
+}
+
+.available .room-number::before {
+    background-color: #10b981; /* green-500 */
+}
+
+.occupied .room-number::before {
+    background-color: #ef4444; /* red-500 */
+}
+
+.maintenance .room-number::before {
+    background-color: #6b7280; /* gray-500 */
+}
+
+.room-info {
+    margin-top: 8px;
+    font-size: 0.875rem;
+}
+
+.room-info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid #e5e7eb; /* gray-200 */
+}
+
+.room-info-item:last-child {
+    border-bottom: none;
+}
+
+.room-actions {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.room-action-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: background-color 0.2s;
+}
+
+.room-status-badge {
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
