@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CleaningServiceController;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Appearance;
@@ -27,6 +28,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('rooms/dashboard', [RoomController::class, 'dashboard'])->name('rooms.dashboard');
     Route::patch('rooms/{room}/status', [RoomController::class, 'updateStatus'])->name('rooms.updateStatus');
     Route::resource('rooms', RoomController::class);
+
+
+    //Cleaning Service
+    Route::get('cleaning',[CleaningServiceController::class, 'index'])->name('cleaning.index');
+    Route::patch('cleaning/{room}/update-status',[CleaningServiceController::class, 'updateCleaningStatus'])->name('cleaning.updateStatus');
 
 });
 
