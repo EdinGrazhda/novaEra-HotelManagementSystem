@@ -1,6 +1,10 @@
 <x-layouts.app :title="__('Cleaning Room')">
 <!-- Include custom CSS for cleaning -->
 <link href="{{ asset('css/cleaning.css') }}" rel="stylesheet">
+<link href="{{ asset('css/room-overrides.css') }}" rel="stylesheet">
+<link href="{{ asset('css/room-card-fixes.css') }}" rel="stylesheet">
+<link href="{{ asset('css/room-status-colors.css') }}" rel="stylesheet">
+<link href="{{ asset('css/cleaning-colors.css') }}" rel="stylesheet">
 <!-- Add CSRF Token meta tag -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -21,6 +25,26 @@
             // Auto-hide the success message after 5 seconds
             setTimeout(function() {
                 const alert = document.getElementById('success-alert');
+                if (alert) {
+                    alert.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+                    setTimeout(() => alert.remove(), 500);
+                }
+            }, 1500);
+        </script>
+    @endif
+    
+    @if(session('error'))
+        <div id="error-alert" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+            <div class="flex justify-between items-center">
+                <p>{{ session('error') }}</p>
+                <span class="text-red-700 hover:text-red-800 cursor-pointer" onclick="document.getElementById('error-alert').remove()">×</span>
+            </div>
+        </div>
+
+        <script>
+            // Auto-hide the error message after 5 seconds
+            setTimeout(function() {
+                const alert = document.getElementById('error-alert');
                 if (alert) {
                     alert.classList.add('opacity-0', 'transition-opacity', 'duration-500');
                     setTimeout(() => alert.remove(), 500);
@@ -59,15 +83,23 @@
             </div>
         </div>
     </div>
-    
-    <!-- Room grid display for cleaning -->
+      <!-- Room grid display for cleaning -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        @forelse($cleaning as $room)            <div class="room-box border-t-4 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all" 
-                data-status="{{ $room->cleaning_status }}"
+        @forelse($cleaning as $room)
+            <div class="room-box border-t-4 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all" 
+                data-status="{{ $room->room_status }}"
+                data-cleaning="{{ $room->cleaning_status }}"
                 data-room="{{ $room->id }}"
-                style="{{ $room->cleaning_status == 'clean' ? 'border-color: #10B981; background-color: #ECFDF5' : 
-                    ($room->cleaning_status == 'not_cleaned' ? 'border-color: #EF4444; background-color: #FEF2F2' : 
-                    'border-color: #F59E0B; background-color: #FEF3C7') }}">
+                data-floor="{{ $room->room_floor }}"
+                style="
+                    @if($room->room_status == 'available')
+                        border-color: #10B981 !important; background-color: #ECFDF5 !important;
+                    @elseif($room->room_status == 'occupied') 
+                        border-color: #EF4444 !important; background-color: #FEF2F2 !important;
+                    @else 
+                        border-color: #6B7280 !important; background-color: #F9FAFB !important;
+                    @endif
+                ">
                 
                 <div class="p-4">
                     <div class="flex justify-between items-center">
@@ -91,10 +123,8 @@
                         </div>
                         <div class="room-info-item">
                             <span>Cleaning Status</span>
-                            <span class="font-medium room-status-badge
-                                {{ $room->cleaning_status == 'clean' ? 'bg-green-100 text-green-800' : 
-                                   ($room->cleaning_status == 'not_cleaned' ? 'bg-red-100 text-red-800' : 
-                                   'bg-yellow-100 text-yellow-800') }}">
+                            <span class="font-medium room-status-badge {{ $room->cleaning_status }}"
+                                data-cleaning-status="{{ $room->cleaning_status }}">
                                 {{ ucfirst(str_replace('_', ' ', $room->cleaning_status)) }}
                             </span>
                         </div>
@@ -102,33 +132,57 @@
                 </div>
                 
                 <div class="bg-white bg-opacity-50 px-4 py-3 border-t border-gray-200">
-                    <!-- Cleaning status action buttons -->
+                    <!-- Cleaning status action buttons using Laravel forms -->
                     <div class="flex flex-col gap-2">
                         <div class="flex justify-between items-center">
                             <span class="text-sm font-medium text-gray-600">Change Cleaning Status:</span>
                         </div>
-                        <div class="flex justify-between gap-2">
-                            <button class="clean-status-btn flex-1 px-2 py-1 text-xs bg-green-100 text-green-800 rounded hover:bg-green-200 {{ $room->cleaning_status == 'clean' ? 'border-2 border-green-500' : '' }}" 
-                                    data-room="{{ $room->id }}" 
-                                    data-status="clean">
-                                Clean
-                            </button>
-                            <button class="clean-status-btn flex-1 px-2 py-1 text-xs bg-red-100 text-red-800 rounded hover:bg-red-200 {{ $room->cleaning_status == 'not_cleaned' ? 'border-2 border-red-500' : '' }}" 
-                                    data-room="{{ $room->id }}" 
-                                    data-status="not_cleaned">
-                                Not Cleaned
-                            </button>
-                            <button class="clean-status-btn flex-1 px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 {{ $room->cleaning_status == 'in_progress' ? 'border-2 border-yellow-500' : '' }}" 
-                                    data-room="{{ $room->id }}" 
-                                    data-status="in_progress">
-                                In Progress
-                            </button>
+                        
+                        <div class="grid grid-cols-3 gap-2">
+                            <form action="{{ route('cleaning.updateStatus', $room->id) }}" method="POST" class="flex-1">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="cleaning_status" value="clean">
+                                <input type="hidden" name="cleaning_notes" value="{{ $room->cleaning_notes }}">
+                                <button type="submit" class="w-full h-8 px-2 py-1 text-xs bg-green-100 text-green-800 rounded hover:bg-green-200 flex items-center justify-center {{ $room->cleaning_status == 'clean' ? 'border-2 border-green-500' : '' }}">
+                                    Clean
+                                </button>
+                            </form>
+                            
+                            <form action="{{ route('cleaning.updateStatus', $room->id) }}" method="POST" class="flex-1">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="cleaning_status" value="not_cleaned">
+                                <input type="hidden" name="cleaning_notes" value="{{ $room->cleaning_notes }}">
+                                <button type="submit" class="w-full h-8 px-2 py-1 text-xs bg-red-100 text-red-800 rounded hover:bg-red-200 flex items-center justify-center {{ $room->cleaning_status == 'not_cleaned' ? 'border-2 border-red-500' : '' }}">
+                                    Not Cleaned
+                                </button>
+                            </form>
+                            
+                            <form action="{{ route('cleaning.updateStatus', $room->id) }}" method="POST" class="flex-1">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="cleaning_status" value="in_progress">
+                                <input type="hidden" name="cleaning_notes" value="{{ $room->cleaning_notes }}">
+                                <button type="submit" class="w-full h-8 px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 flex items-center justify-center {{ $room->cleaning_status == 'in_progress' ? 'border-2 border-yellow-500' : '' }}">
+                                    In Progress
+                                </button>
+                            </form>
                         </div>
+                        
+                        <!-- Cleaning notes form -->
                         <div class="mt-2">
-                            <input type="text" placeholder="Add cleaning notes..." 
-                                   class="cleaning-notes w-full px-3 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#F8B803]"
-                                   data-room="{{ $room->id }}" 
-                                   value="{{ $room->cleaning_notes }}">
+                            <form action="{{ route('cleaning.updateStatus', $room->id) }}" method="POST" class="flex">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="cleaning_status" value="{{ $room->cleaning_status }}">
+                                <input type="text" name="cleaning_notes" placeholder="Add cleaning notes..." 
+                                       class="w-full px-3 py-1 text-xs border border-gray-300 rounded-l-md focus:outline-none focus:ring-1 focus:ring-[#F8B803]"
+                                       value="{{ $room->cleaning_notes }}">
+                                <button type="submit" class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-r-md hover:bg-blue-200 border border-blue-300">
+                                    Save
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -142,34 +196,109 @@
             </div>
         @endforelse
     </div>
-      <!-- Include the cleaning.js script -->
-    <script src="{{ asset('js/cleaning.js') }}"></script>
     
     <script>
-        // Debug info
-        console.log('Cleaning page loaded');
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM fully loaded');
-            // Check if CSRF token is available
-            const csrfToken = document.querySelector('meta[name="csrf-token"]');
-            if (csrfToken) {
-                console.log('CSRF token available: ' + csrfToken.getAttribute('content').substring(0, 10) + '...');
-            } else {
-                console.error('CSRF token not found!');
+            // Get all necessary elements
+            const searchInput = document.getElementById('room-search');
+            const clearButton = document.getElementById('clear-search');
+            const roomBoxes = document.querySelectorAll('.room-box');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            let currentFilter = 'all'; // Track current filter state
+            
+            // Debug log for room boxes
+            console.log("Room boxes and their cleaning statuses:");
+            roomBoxes.forEach(room => {
+                const roomNumber = room.querySelector('.room-number').textContent;
+                const cleaningStatus = room.getAttribute('data-cleaning');
+                console.log(`Room ${roomNumber}: ${cleaningStatus}`);
+            });
+            
+            // Search functionality
+            function filterRoomsBySearch() {
+                const searchTerm = searchInput.value.toLowerCase();
+                
+                roomBoxes.forEach(room => {
+                    const roomNumber = room.querySelector('.room-number').textContent.toLowerCase();
+                    const roomFloor = room.getAttribute('data-floor') || '';
+                    const shouldShowByFilter = currentFilter === 'all' || room.getAttribute('data-cleaning') === currentFilter;
+                    
+                    // Only apply search filter to rooms that pass the cleaning status filter
+                    if (shouldShowByFilter) {
+                        if (roomNumber.includes(searchTerm) || roomFloor.toLowerCase().includes(searchTerm)) {
+                            room.style.display = '';
+                        } else {
+                            room.style.display = 'none';
+                        }
+                    }
+                });
             }
             
-            // Log all room boxes
-            const roomBoxes = document.querySelectorAll('.room-box');
-            console.log(`Found ${roomBoxes.length} room boxes`);
+            // Filter functionality by cleaning status
+            function filterRoomsByStatus(filter) {
+                console.log(`Filtering rooms by status: ${filter}`);
+                currentFilter = filter;
+                
+                roomBoxes.forEach(room => {
+                    const cleaningStatus = room.getAttribute('data-cleaning');
+                    console.log(`Room ${room.querySelector('.room-number').textContent}: status=${cleaningStatus}, filter=${filter}`);
+                    
+                    if (filter === 'all' || cleaningStatus === filter) {
+                        room.style.display = '';
+                    } else {
+                        room.style.display = 'none';
+                    }
+                });
+                
+                // Re-apply search filter on top of cleaning status filter
+                if (searchInput && searchInput.value) {
+                    filterRoomsBySearch();
+                }
+            }
             
-            // Log all cleaning status buttons
-            const statusButtons = document.querySelectorAll('.clean-status-btn');
-            console.log(`Found ${statusButtons.length} status buttons`);
+            // Set up search event listener
+            if (searchInput) {
+                searchInput.addEventListener('input', filterRoomsBySearch);
+                
+                // Show/hide clear button based on search input
+                searchInput.addEventListener('input', function() {
+                    if (this.value.length > 0 && clearButton) {
+                        clearButton.style.display = 'flex';
+                    } else if (clearButton) {
+                        clearButton.style.display = 'none';
+                    }
+                });
+            }
             
-            // Log all notes inputs
-            const notesInputs = document.querySelectorAll('.cleaning-notes');
-            console.log(`Found ${notesInputs.length} notes inputs`);
+            // Set up clear button functionality
+            if (clearButton) {
+                clearButton.addEventListener('click', function() {
+                    if (searchInput) {
+                        searchInput.value = '';
+                        clearButton.style.display = 'none';
+                        filterRoomsByStatus(currentFilter); // Reset to current filter state
+                    }
+                });
+            }
+            
+            // Set up filter button event listeners
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Update active button
+                    filterButtons.forEach(btn => btn.classList.remove('active-filter'));
+                    this.classList.add('active-filter');
+                    
+                    // Apply the filter
+                    filterRoomsByStatus(filter);
+                });
+            });
         });
     </script>
+    
+    <!-- Include room color manager only -->
+    <script src="{{ asset('js/room-color-manager.js') }}"></script>
 </div>
 </x-layouts.app>

@@ -105,14 +105,67 @@ class RoomController extends Controller
         $oldStatus = $room->room_status;
         $newStatus = $request->room_status;
         
-        $room->update([
+        $updateData = [
             'room_status' => $newStatus
-        ]);
+        ];
+        
+      
+        if ($oldStatus === 'occupied' && $newStatus === 'available') {
+            $updateData['cleaning_status'] = 'not_cleaned';
+        }
+        
+      
+        if ($newStatus === 'occupied') {
+            $updateData['cleaning_status'] = 'clean';
+        }
+        
+   
+        if ($oldStatus === 'maintenance' && $newStatus === 'available') {
+            $updateData['cleaning_status'] = 'clean';
+        }
+        
+        $room->update($updateData);
 
         $statusMessage = 'Room status changed from ' . ucfirst($oldStatus) . ' to ' . ucfirst($newStatus) . ' successfully.';
         
+       
+        if (isset($updateData['cleaning_status'])) {
+            $cleaningStatusText = str_replace('_', ' ', $updateData['cleaning_status']);
+            $statusMessage .= ' Cleaning status set to ' . ucfirst($cleaningStatusText) . '.';
+        }
+        
         return redirect()->route('rooms.show', $room)
                         ->with('success', $statusMessage);
+    }
+    
+    /**
+     * Update the cleaning status of a room.
+     */
+    public function updateCleaningStatus(Request $request, Room $room)
+    {
+        $request->validate([
+            'cleaning_status' => 'required|in:not_cleaned,clean,in_progress',
+            'cleaning_notes' => 'nullable|string|max:255',
+        ]);
+        
+        $oldStatus = $room->cleaning_status ?? 'clean';
+        $newStatus = $request->cleaning_status;
+        
+        $updateData = [
+            'cleaning_status' => $newStatus
+        ];
+        
+        // Add cleaning notes if provided
+        if ($request->has('cleaning_notes')) {
+            $updateData['cleaning_notes'] = $request->cleaning_notes;
+        }
+        
+        $room->update($updateData);
+        
+        $cleaningStatusText = str_replace('_', ' ', $newStatus);
+        $statusMessage = 'Cleaning status changed to ' . ucfirst($cleaningStatusText) . ' successfully.';
+        
+        return redirect()->back()->with('success', $statusMessage);
     }
 
     /**

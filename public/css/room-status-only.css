@@ -1,0 +1,64 @@
+/* 
+ * Room Status Only Colors - This CSS ensures room background colors
+ * are based strictly on room status (available, occupied, maintenance)
+ * and completely ignore cleaning status (clean, not_cleaned, in_progress)
+ */
+
+/* Reset any styling based on cleaning status */
+.room-box[data-cleaning="clean"],
+.room-box[data-cleaning="not_cleaned"],
+.room-box[data-cleaning="in_progress"] {
+    /* These selectors have lower specificity than the data-status ones below */
+}
+
+/* Strong specificity for room status colors */
+.room-box.room-box-available,
+.room-box[data-status="available"] {
+    background-color: #ecfdf5 !important; /* green-50 */
+    border-color: #10b981 !important; /* green-500 */
+}
+
+.room-box.room-box-occupied,
+.room-box[data-status="occupied"] {
+    background-color: #fef2f2 !important; /* red-50 */
+    border-color: #ef4444 !important; /* red-500 */
+}
+
+.room-box.room-box-maintenance,
+.room-box[data-status="maintenance"] {
+    background-color: #f9fafb !important; /* gray-50 */
+    border-color: #6b7280 !important; /* gray-500 */
+}
+
+/* Make cleaning status badges distinct but not affecting card background */
+.room-cleaning-badge {
+    display: inline-flex !important;
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 9999px !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+}
+
+/* Clean status badge */
+.room-cleaning-badge.bg-green-100,
+.room-cleaning-badge.clean {
+    background-color: #ecfdf5 !important;
+    color: #047857 !important;
+    border: 1px solid #10b981 !important;
+}
+
+/* Not cleaned status badge */
+.room-cleaning-badge.bg-red-100,
+.room-cleaning-badge.not_cleaned {
+    background-color: #fef2f2 !important;
+    color: #b91c1c !important;
+    border: 1px solid #ef4444 !important;
+}
+
+/* In progress status badge */
+.room-cleaning-badge.bg-yellow-100,
+.room-cleaning-badge.in_progress {
+    background-color: #fffbeb !important;
+    color: #92400e !important;
+    border: 1px solid #f59e0b !important;
+}

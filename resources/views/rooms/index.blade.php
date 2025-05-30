@@ -1,6 +1,15 @@
 <x-layouts.app :title="__('Rooms')">
-<!-- Include custom CSS for rooms -->
+<!-- Track navigation for cleaning page auto-refresh -->
+<script>
+    // Record that we visited the rooms page
+    sessionStorage.setItem('previousPage', window.location.pathname);
+</script>
+<!-- Include custom CSS for rooms -->            
 <link href="{{ asset('css/rooms.css') }}" rel="stylesheet">
+<link href="{{ asset('css/room-overrides.css') }}" rel="stylesheet">
+<link href="{{ asset('css/room-card-fixes.css') }}" rel="stylesheet">
+<link href="{{ asset('css/room-status-colors.css') }}" rel="stylesheet">
+<link href="{{ asset('css/room-status-only.css') }}" rel="stylesheet">
 
 <div class="container mx-auto px-4 py-8">
     <div class="mb-6 flex justify-between items-center">
@@ -42,6 +51,16 @@
                 </div>
             </div>
             
+            <div class="flex flex-wrap items-center gap-4 mt-3">
+                <div class="font-semibold">Filter by cleaning:</div>
+                <div class="flex gap-3">
+                    <button data-cleaning-filter="all" class="cleaning-filter-btn active-filter px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-sm hover:bg-gray-300">All</button>
+                    <button data-cleaning-filter="clean" class="cleaning-filter-btn px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm hover:bg-green-200">Clean</button>
+                    <button data-cleaning-filter="not_cleaned" class="cleaning-filter-btn px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm hover:bg-red-200">Not Cleaned</button>
+                    <button data-cleaning-filter="in_progress" class="cleaning-filter-btn px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm hover:bg-yellow-200">In Progress</button>
+                </div>
+            </div>
+            
             <!-- Search Bar -->            <div class="relative w-72">
                 <input type="text" id="room-search" placeholder="Search by room #, category, floor..." 
                     class="w-full px-4 py-2 pl-10 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F8B803]">
@@ -62,11 +81,21 @@
         <!-- Room grid display -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @forelse($rooms as $room)
-            <div class="room-box {{ $room->room_status }} border-t-4 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all" 
+            <div class="room-box {{ $room->room_status }} border-t-4 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all relative" 
                 data-status="{{ $room->room_status }}"
-                style="{{ $room->room_status == 'available' ? 'border-color: #10B981; background-color: #ECFDF5' : 
-                    ($room->room_status == 'occupied' ? 'border-color: #EF4444; background-color: #FEF2F2' : 
-                    'border-color: #6B7280; background-color: #F9FAFB') }}">
+                data-cleaning="{{ $room->cleaning_status ?? 'clean' }}"
+                data-floor="{{ $room->room_floor }}"
+                style="
+                    @if($room->room_status == 'available')
+                        border-color: #10B981 !important; background-color: #ECFDF5 !important;
+                    @elseif($room->room_status == 'occupied') 
+                        border-color: #EF4444 !important; background-color: #FEF2F2 !important;
+                    @else 
+                        border-color: #6B7280 !important; background-color: #F9FAFB !important;
+                    @endif
+                ">
+                
+                <!-- Cleaning status badges removed from top of card -->
                 
                 <div class="p-4">
                     <div class="flex justify-between items-center">
@@ -93,6 +122,14 @@
                                 {{ $room->room_status == 'available' ? 'bg-green-100 text-green-800' : 
                                 ($room->room_status == 'occupied' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
                                 {{ ucfirst($room->room_status) }}
+                            </span>
+                        </div>
+                        
+                        <div class="room-info-item">
+                            <span>Cleaning</span>
+                            <span class="font-medium room-cleaning-badge {{ $room->cleaning_status ?? 'clean' }}" 
+                                data-cleaning-status="{{ $room->cleaning_status ?? 'clean' }}">
+                                {{ ucfirst(str_replace('_', ' ', $room->cleaning_status ?? 'clean')) }}
                             </span>
                         </div>
                     </div>
@@ -153,7 +190,9 @@
         @endforelse
     </div>
     
-    <!-- Include the rooms.js script -->
+    <!-- Include the room scripts -->
+    <script src="{{ asset('js/room-color-manager.js') }}"></script>
+    <script src="{{ asset('js/cleaning-status-sync.js') }}"></script>
     <script src="{{ asset('js/rooms.js') }}"></script>
 </div>
 </x-layouts.app>

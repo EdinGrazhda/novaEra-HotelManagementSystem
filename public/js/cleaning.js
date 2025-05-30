@@ -8,6 +8,28 @@ document.addEventListener("DOMContentLoaded", function () {
     const cleanStatusButtons = document.querySelectorAll(".clean-status-btn");
     const cleaningNotes = document.querySelectorAll(".cleaning-notes");
 
+    // Force room colors to be based on room status only
+    function applyRoomStatusColors() {
+        roomBoxes.forEach((roomBox) => {
+            const roomStatus = roomBox.getAttribute("data-status");
+
+            // Apply color based on room status only
+            if (roomStatus === "available") {
+                roomBox.style.backgroundColor = "#ECFDF5";
+                roomBox.style.borderColor = "#10B981";
+            } else if (roomStatus === "occupied") {
+                roomBox.style.backgroundColor = "#FEF2F2";
+                roomBox.style.borderColor = "#EF4444";
+            } else if (roomStatus === "maintenance") {
+                roomBox.style.backgroundColor = "#F9FAFB";
+                roomBox.style.borderColor = "#6B7280";
+            }
+        });
+    }
+
+    // Apply colors on page load
+    applyRoomStatusColors();
+
     // Current filter state
     let currentFilter = "all";
 
@@ -141,25 +163,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 updateCleaningStatus(roomId, status, notes);
             }
         });
-    });
-
-    // Function to update room box appearance based on cleaning status
+    }); // Function to update room box appearance based on cleaning status
     function updateRoomBoxAppearance(roomBox, status) {
-        // Update the data-status attribute
-        roomBox.setAttribute("data-status", status);
+        // Update the data-cleaning attribute, not data-status
+        roomBox.setAttribute("data-cleaning", status);
 
-        // Update the border and background color
-        if (status === "clean") {
-            roomBox.style.borderColor = "#10B981";
-            roomBox.style.backgroundColor = "#ECFDF5";
-        } else if (status === "not_cleaned") {
-            roomBox.style.borderColor = "#EF4444";
-            roomBox.style.backgroundColor = "#FEF2F2";
-        } else {
-            // in_progress
-            roomBox.style.borderColor = "#F59E0B";
-            roomBox.style.backgroundColor = "#FEF3C7";
-        }
+        // DON'T change the background/border color based on cleaning status
+        // Keep the colors based on room status (available/occupied/maintenance)
+        // which is stored in data-status attribute
 
         // Update the status badge text and color
         const statusBadge = roomBox.querySelector(".room-status-badge");
@@ -234,16 +245,35 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data.success) {
                     console.log("Cleaning status updated successfully:", data);
 
+                    // Store the update for cross-page synchronization
+                    if (window.storeCleaningStatusUpdate) {
+                        window.storeCleaningStatusUpdate(roomId, status, notes);
+                    }
+
                     // Update the room box with the returned data
                     const updatedRoomBox = document.querySelector(
                         `.room-box[data-room="${roomId}"]`
                     );
                     if (updatedRoomBox) {
-                        // Update the status attribute
+                        // Update the cleaning status attribute, but not room status
                         updatedRoomBox.setAttribute(
-                            "data-status",
+                            "data-cleaning",
                             data.cleaning_status
                         );
+
+                        // Ensure room colors are maintained based on room status only
+                        const roomStatus =
+                            updatedRoomBox.getAttribute("data-status");
+                        if (roomStatus === "available") {
+                            updatedRoomBox.style.backgroundColor = "#ECFDF5";
+                            updatedRoomBox.style.borderColor = "#10B981";
+                        } else if (roomStatus === "occupied") {
+                            updatedRoomBox.style.backgroundColor = "#FEF2F2";
+                            updatedRoomBox.style.borderColor = "#EF4444";
+                        } else if (roomStatus === "maintenance") {
+                            updatedRoomBox.style.backgroundColor = "#F9FAFB";
+                            updatedRoomBox.style.borderColor = "#6B7280";
+                        }
 
                         // Update the note input if it exists and has changed
                         const noteInput =

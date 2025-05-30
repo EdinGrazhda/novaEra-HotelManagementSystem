@@ -27,6 +27,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('rooms', [RoomController::class, 'index'])->name('rooms.index');
     Route::get('rooms/dashboard', [RoomController::class, 'dashboard'])->name('rooms.dashboard');
     Route::patch('rooms/{room}/status', [RoomController::class, 'updateStatus'])->name('rooms.updateStatus');
+    Route::patch('rooms/{room}/cleaning-status', [RoomController::class, 'updateCleaningStatus'])->name('rooms.updateCleaningStatus');
     Route::resource('rooms', RoomController::class);
 
 

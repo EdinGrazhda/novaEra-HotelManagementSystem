@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Log;
 use App\Models\Room;
 use Illuminate\Http\Request;
 
@@ -63,7 +64,7 @@ class CleaningServiceController extends Controller
     {
         try {
             // Log the incoming request data for debugging
-            \Log::info('Cleaning status update request', [
+            Log::info('Cleaning status update request', [
                 'room_id' => $room->id,
                 'request_data' => $request->all()
             ]);
@@ -74,40 +75,51 @@ class CleaningServiceController extends Controller
             ]);
             
             // Log the validated data
-            \Log::info('Validated cleaning status data', [
+            Log::info('Validated cleaning status data', [
                 'room_id' => $room->id,
                 'validated_data' => $validated
             ]);
             
             $room->update($validated);
             
-            // Verify the update was successful
+      
             $room->refresh();
             
-            \Log::info('Cleaning status updated successfully', [
+            Log::info('Cleaning status updated successfully', [
                 'room_id' => $room->id,
                 'cleaning_status' => $room->cleaning_status,
                 'cleaning_notes' => $room->cleaning_notes,
             ]);
             
-            return response()->json([
-                'success' => true,
-                'message' => 'Cleaning status updated successfully',
-                'cleaning_status' => $room->cleaning_status,
-                'cleaning_notes' => $room->cleaning_notes,
-            ]);
+            
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Cleaning status updated successfully',
+                    'cleaning_status' => $room->cleaning_status,
+                    'cleaning_notes' => $room->cleaning_notes,
+                ]);
+            }
+            
+            // For regular form submission, redirect back with success message
+            return redirect()->back()->with('success', 'Cleaning status updated successfully');
         } catch (\Exception $e) {
-            \Log::error('Error updating cleaning status', [
+            Log::error('Error updating cleaning status', [
                 'room_id' => $room->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
             
-            return response()->json([
-                'success' => false,
-                'message' => 'Error updating cleaning status',
-                'error' => $e->getMessage(),
-            ], 500);
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error updating cleaning status',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+            
+            // For regular form submission, redirect back with error
+            return redirect()->back()->with('error', 'Error updating cleaning status: ' . $e->getMessage());
         }
     }
 

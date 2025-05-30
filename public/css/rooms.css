@@ -29,7 +29,8 @@
 }
 
 @media (max-width: 640px) {
-    .filter-btn {
+    .filter-btn,
+    .cleaning-filter-btn {
         font-size: 0.7rem;
         padding: 0.15rem 0.5rem;
     }
@@ -61,6 +62,19 @@
 
 .maintenance .room-number::before {
     background-color: #6b7280; /* gray-500 */
+}
+
+/* Add stronger room box background colors */
+.room-box.available {
+    background-color: #ecfdf5 !important; /* green-50 */
+}
+
+.room-box.occupied {
+    background-color: #fef2f2 !important; /* red-50 */
+}
+
+.room-box.maintenance {
+    background-color: #f9fafb !important; /* gray-50 */
 }
 
 .room-info {
@@ -98,4 +112,64 @@
     border-radius: 9999px;
     font-size: 0.75rem;
     font-weight: 500;
+}
+
+/* Cleaning status styling */
+.cleaning-filter-btn {
+    transition: all 0.2s ease-in-out;
+}
+
+.cleaning-filter-btn:hover {
+    transform: translateY(-1px);
+}
+
+.cleaning-filter-btn.active-filter {
+    font-weight: bold;
+}
+
+/* Room cleaning status badges */
+.room-cleaning-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    line-height: 1;
+    text-transform: capitalize;
+}
+
+/* Room status with cleaning indicator */
+.room-box[data-status="available"][data-cleaning="not_cleaned"] {
+    position: relative;
+    background-color: #fef2f2 !important; /* red-50 */
+    border-color: #ef4444 !important; /* red-500 */
+}
+
+.room-box[data-status="available"][data-cleaning="in_progress"] {
+    position: relative;
+    background-color: #fef3c7 !important; /* yellow-50 */
+    border-color: #f59e0b !important; /* amber-500 */
+}
+
+.room-box[data-status="available"][data-cleaning="clean"] {
+    background-color: #ecfdf5 !important; /* green-50 */
+    border-color: #10b981 !important; /* green-500 */
+}
+
+/* Highlight rooms that are available but need cleaning */
+.room-box[data-status="available"][data-cleaning="not_cleaned"]
+    .room-number::before,
+.room-box[data-status="available"][data-cleaning="in_progress"]
+    .room-number::before {
+    background-color: #fcd34d;
+}
+
+.room-box[data-status="available"][data-cleaning="clean"] .room-number::before {
+    background-color: #34d399;
+}
+
+.room-box[data-status="occupied"] .room-number::before {
+    background-color: #f87171;
+}
+
+.room-box[data-status="maintenance"] .room-number::before {
+    background-color: #9ca3af;
 }

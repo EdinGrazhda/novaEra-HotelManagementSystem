@@ -1,0 +1,51 @@
+/* Force room card colors based on room status only */
+
+/* Room available - regardless of cleaning status */
+.room-box[data-status="available"] {
+    border-color: #10b981 !important; /* green-500 */
+    background-color: #ecfdf5 !important; /* green-50 */
+}
+
+/* Room occupied */
+.room-box[data-status="occupied"] {
+    border-color: #ef4444 !important; /* red-500 */
+    background-color: #fef2f2 !important; /* red-50 */
+}
+
+/* Room in maintenance */
+.room-box[data-status="maintenance"] {
+    border-color: #6b7280 !important; /* gray-500 */
+    background-color: #f9fafb !important; /* gray-50 */
+}
+
+/* Hide all status badges at the top of room cards */
+.room-box .absolute.top-0.right-0 {
+    display: none !important;
+}
+
+/* Hide the double text in specific locations */
+span:contains("Double") {
+    display: none !important;
+}
+
+/* Set the room number dot color based on room status only */
+.room-box[data-status="available"] .room-number::before {
+    background-color: #10b981 !important; /* green-500 */
+}
+
+.room-box[data-status="occupied"] .room-number::before {
+    background-color: #ef4444 !important; /* red-500 */
+}
+
+.room-box[data-status="maintenance"] .room-number::before {
+    background-color: #6b7280 !important; /* gray-500 */
+}
+
+/* Make sure cleaning status badges have the right colors */
+.room-cleaning-badge {
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 9999px !important;
+    font-size: 0.75rem !important;
+    line-height: 1 !important;
+    text-transform: capitalize !important;
+}

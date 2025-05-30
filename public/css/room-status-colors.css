@@ -1,0 +1,51 @@
+/* This file ensures room colors are only based on room status */
+
+/* Override any cleaning-specific background colors */
+.room-box {
+    transition: background-color 0.3s ease, border-color 0.3s ease !important;
+}
+
+/* Force background colors based on room status only */
+.room-box[data-status="available"] {
+    background-color: #ecfdf5 !important; /* green-50 */
+    border-color: #10b981 !important; /* green-500 */
+}
+
+.room-box[data-status="occupied"] {
+    background-color: #fef2f2 !important; /* red-50 */
+    border-color: #ef4444 !important; /* red-500 */
+}
+
+.room-box[data-status="maintenance"] {
+    background-color: #f9fafb !important; /* gray-50 */
+    border-color: #6b7280 !important; /* gray-500 */
+}
+
+/* Style badges for cleaning status properly */
+.room-status-badge {
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 9999px !important;
+    font-weight: 500 !important;
+    font-size: 0.75rem !important;
+}
+
+/* Clean status badge */
+.room-status-badge.clean {
+    background-color: #ecfdf5 !important;
+    color: #047857 !important;
+    border: 1px solid #10b981 !important;
+}
+
+/* Not cleaned status badge */
+.room-status-badge.not_cleaned {
+    background-color: #fef2f2 !important;
+    color: #b91c1c !important;
+    border: 1px solid #ef4444 !important;
+}
+
+/* In progress status badge */
+.room-status-badge.in_progress {
+    background-color: #fffbeb !important;
+    color: #92400e !important;
+    border: 1px solid #f59e0b !important;
+}
