@@ -21,12 +21,47 @@ class RoomController extends Controller
     }
 
     /**
-     * Display a listing of the rooms.
+     * Display a listing of the rooms with filtering.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $rooms = Room::with('category')->get();
-        return view('rooms.index', compact('rooms'));
+        $query = Room::with('category');
+        
+        // Apply status filter
+        if ($request->has('status_filter') && $request->status_filter !== 'all') {
+            $query->where('room_status', $request->status_filter);
+        }
+        
+        // Apply cleaning status filter
+        if ($request->has('cleaning_filter') && $request->cleaning_filter !== 'all') {
+            $query->where('cleaning_status', $request->cleaning_filter);
+        }
+        
+        // Apply search filter
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('room_number', 'like', "%{$search}%")
+                  ->orWhere('room_floor', 'like', "%{$search}%")
+                  ->orWhereHas('roomCategory', function($q2) use ($search) {
+                      $q2->where('category_name', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        // Get selected filters for UI highlighting
+        $statusFilter = $request->status_filter ?? 'all';
+        $cleaningFilter = $request->cleaning_filter ?? 'all'; 
+        $searchQuery = $request->search ?? '';
+        
+        $rooms = $query->get();
+        
+        return view('rooms.index', compact(
+            'rooms', 
+            'statusFilter', 
+            'cleaningFilter', 
+            'searchQuery'
+        ));
     }
 
     /**
@@ -105,14 +140,67 @@ class RoomController extends Controller
         $oldStatus = $room->room_status;
         $newStatus = $request->room_status;
         
-        $room->update([
+        $updateData = [
             'room_status' => $newStatus
-        ]);
+        ];
+        
+      
+        if ($oldStatus === 'occupied' && $newStatus === 'available') {
+            $updateData['cleaning_status'] = 'not_cleaned';
+        }
+        
+      
+        if ($newStatus === 'occupied') {
+            $updateData['cleaning_status'] = 'clean';
+        }
+        
+   
+        if ($oldStatus === 'maintenance' && $newStatus === 'available') {
+            $updateData['cleaning_status'] = 'clean';
+        }
+        
+        $room->update($updateData);
 
         $statusMessage = 'Room status changed from ' . ucfirst($oldStatus) . ' to ' . ucfirst($newStatus) . ' successfully.';
         
+       
+        if (isset($updateData['cleaning_status'])) {
+            $cleaningStatusText = str_replace('_', ' ', $updateData['cleaning_status']);
+            $statusMessage .= ' Cleaning status set to ' . ucfirst($cleaningStatusText) . '.';
+        }
+        
         return redirect()->route('rooms.show', $room)
                         ->with('success', $statusMessage);
+    }
+    
+    /**
+     * Update the cleaning status of a room.
+     */
+    public function updateCleaningStatus(Request $request, Room $room)
+    {
+        $request->validate([
+            'cleaning_status' => 'required|in:not_cleaned,clean,in_progress',
+            'cleaning_notes' => 'nullable|string|max:255',
+        ]);
+        
+        $oldStatus = $room->cleaning_status ?? 'clean';
+        $newStatus = $request->cleaning_status;
+        
+        $updateData = [
+            'cleaning_status' => $newStatus
+        ];
+        
+        // Add cleaning notes if provided
+        if ($request->has('cleaning_notes')) {
+            $updateData['cleaning_notes'] = $request->cleaning_notes;
+        }
+        
+        $room->update($updateData);
+        
+        $cleaningStatusText = str_replace('_', ' ', $newStatus);
+        $statusMessage = 'Cleaning status changed to ' . ucfirst($cleaningStatusText) . ' successfully.';
+        
+        return redirect()->back()->with('success', $statusMessage);
     }
 
     /**

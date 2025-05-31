@@ -1,0 +1,46 @@
+/* Additional overrides to hide cleaning status and room type at the top of cards */
+
+/* Hide the "Not cleaned" and room type labels at the top */
+.room-box {
+    position: relative;
+}
+
+/* Reset any absolute positioned elements in the top corners */
+.room-box .absolute {
+    display: none !important;
+}
+
+/* Ensure the room type badge is properly positioned next to the room number */
+.room-box .flex.justify-between.items-center {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+/* Make sure our card colors match only the room status, not cleaning status */
+.room-box[data-status="available"] {
+    background-color: #ecfdf5 !important; /* green-50 */
+    border-color: #10b981 !important; /* green-500 */
+}
+
+.room-box[data-status="occupied"] {
+    background-color: #fef2f2 !important; /* red-50 */
+    border-color: #ef4444 !important; /* red-500 */
+}
+
+.room-box[data-status="maintenance"] {
+    background-color: #f9fafb !important; /* gray-50 */
+    border-color: #6b7280 !important; /* gray-500 */
+}
+
+/* Make sure cleaning status shows only in the proper location */
+.room-info-item .font-medium.room-cleaning-badge {
+    display: inline-flex !important;
+}
+
+/* Ensure any overlays are cleaned up */
+.room-box::before,
+.room-box::after {
+    content: none !important;
+    display: none !important;
+}

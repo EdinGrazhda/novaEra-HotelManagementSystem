@@ -1,0 +1,102 @@
+/* CSS to ensure cleaning page colors are based on room status only, not cleaning status */
+
+/* Base styling for room boxes */
+.room-box {
+    transition: background-color 0.3s ease, border-color 0.3s ease !important;
+}
+
+/* Set room colors based on room status only - for cleaning management page */
+.room-box[data-status="available"] {
+    background-color: #ecfdf5 !important; /* green-50 */
+    border-color: #10b981 !important; /* green-500 */
+}
+
+.room-box[data-status="occupied"] {
+    background-color: #fef2f2 !important; /* red-50 */
+    border-color: #ef4444 !important; /* red-500 */
+}
+
+.room-box[data-status="maintenance"] {
+    background-color: #f9fafb !important; /* gray-50 */
+    border-color: #6b7280 !important; /* gray-500 */
+}
+
+/* Make cleaning status visually distinct through the badges rather than card background */
+.room-status-badge {
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 9999px !important;
+    font-weight: 500 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    display: inline-block !important;
+}
+
+/* Badge colors for cleaning statuses */
+.room-status-badge:where([class*="clean"]) {
+    background-color: #ecfdf5 !important;
+    color: #047857 !important;
+}
+
+.room-status-badge:where([class*="not_cleaned"]) {
+    background-color: #fef2f2 !important;
+    color: #b91c1c !important;
+}
+
+.room-status-badge:where([class*="in_progress"]) {
+    background-color: #fffbeb !important;
+    color: #92400e !important;
+}
+
+/* Override any conflicting styles that might be applied based on cleaning status */
+.room-box[data-cleaning="clean"],
+.room-box[data-cleaning="not_cleaned"],
+.room-box[data-cleaning="in_progress"] {
+    /* Styles are intentionally left empty as we want the data-status selectors to take precedence */
+}
+
+/* Style for cleaning status buttons */
+.clean-status-btn {
+    padding: 0.375rem 0.75rem !important;
+    border-radius: 0.375rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.clean-status-btn[data-status="clean"] {
+    border-color: #10b981 !important;
+    background-color: #d1fae5 !important;
+    color: #047857 !important;
+}
+
+.clean-status-btn[data-status="not_cleaned"] {
+    border-color: #ef4444 !important;
+    background-color: #fee2e2 !important;
+    color: #b91c1c !important;
+}
+
+.clean-status-btn[data-status="in_progress"] {
+    border-color: #f59e0b !important;
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+}
+
+/* Add visual emphasis for cleaning status buttons */
+.clean-status-btn.active {
+    font-weight: bold !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Green for clean */
+.clean-status-btn[data-status="clean"] {
+    border-color: #10b981 !important;
+}
+
+/* Red for not cleaned */
+.clean-status-btn[data-status="not_cleaned"] {
+    border-color: #ef4444 !important;
+}
+
+/* Yellow/amber for in progress */
+.clean-status-btn[data-status="in_progress"] {
+    border-color: #f59e0b !important;
+}

@@ -1,6 +1,62 @@
 <x-layouts.app :title="__('Rooms')">
-<!-- Include custom CSS for rooms -->
+<!-- Handle filter form submission -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle form submission and preserve other filters
+        const form = document.querySelector('.room-filter-form');
+        const searchInput = form.querySelector('input[name="search"]');
+        
+        // Handle filter button clicks 
+        document.querySelectorAll('button[name="status_filter"], button[name="cleaning_filter"]').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Get the type and value
+                const type = this.getAttribute('name');
+                const value = this.getAttribute('value');
+                
+                // Create or update form parameters
+                const formData = new FormData(form);
+                formData.set(type, value);
+                
+                // Build the URL with all parameters
+                let url = form.action + '?';
+                for (const [key, val] of formData.entries()) {
+                    if (val) {
+                        url += encodeURIComponent(key) + '=' + encodeURIComponent(val) + '&';
+                    }
+                }
+                
+                // Navigate to the filtered URL
+                window.location.href = url.slice(0, -1);  // Remove trailing &
+            });
+        });
+        
+        // Handle search submit to preserve selected filters
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Build URL with all current parameters
+            const formData = new FormData(form);
+            let url = form.action + '?';
+            
+            for (const [key, val] of formData.entries()) {
+                if (val) {
+                    url += encodeURIComponent(key) + '=' + encodeURIComponent(val) + '&';
+                }
+            }
+            
+            // Navigate to the filtered URL
+            window.location.href = url.slice(0, -1);  // Remove trailing &
+        });
+    });
+</script>
+<!-- Include custom CSS for rooms -->            
 <link href="{{ asset('css/rooms.css') }}" rel="stylesheet">
+<link href="{{ asset('css/room-overrides.css') }}" rel="stylesheet">
+<link href="{{ asset('css/room-card-fixes.css') }}" rel="stylesheet">
+<link href="{{ asset('css/room-status-colors.css') }}" rel="stylesheet">
+<link href="{{ asset('css/room-status-only.css') }}" rel="stylesheet">
 
 <div class="container mx-auto px-4 py-8">
     <div class="mb-6 flex justify-between items-center">
@@ -30,43 +86,107 @@
                 }
             }, 1500);
         </script>
-    @endif    <!-- Room filter controls -->    <div class="mb-6 bg-white rounded-lg shadow-sm p-4">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="flex flex-wrap items-center gap-4">
-                <div class="font-semibold">Filter by status:</div>
-                <div class="flex gap-3">
-                    <button data-filter="all" class="filter-btn active-filter px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-sm hover:bg-gray-300">All</button>
-                    <button data-filter="available" class="filter-btn px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm hover:bg-green-200">Available</button>
-                    <button data-filter="occupied" class="filter-btn px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm hover:bg-red-200">Occupied</button>
-                    <button data-filter="maintenance" class="filter-btn px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm hover:bg-gray-300">Maintenance</button>
+    @endif    <!-- Room filter controls with Laravel -->
+    <div class="mb-6 bg-white rounded-lg shadow-sm p-4">
+        <form action="{{ route('rooms.index') }}" method="GET" class="room-filter-form">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-4">
+                    <div class="font-semibold">Filter by status:</div>
+                    <div class="flex gap-3">
+                        <button type="submit" name="status_filter" value="all" 
+                                class="px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-sm hover:bg-gray-300 
+                                {{ $statusFilter === 'all' ? 'active-filter' : '' }}">
+                            All
+                        </button>
+                        <button type="submit" name="status_filter" value="available" 
+                                class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm hover:bg-green-200 
+                                {{ $statusFilter === 'available' ? 'active-filter' : '' }}">
+                            Available
+                        </button>
+                        <button type="submit" name="status_filter" value="occupied" 
+                                class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm hover:bg-red-200 
+                                {{ $statusFilter === 'occupied' ? 'active-filter' : '' }}">
+                            Occupied
+                        </button>
+                        <button type="submit" name="status_filter" value="maintenance" 
+                                class="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm hover:bg-gray-300 
+                                {{ $statusFilter === 'maintenance' ? 'active-filter' : '' }}">
+                            Maintenance
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-4 mt-3">
+                    <div class="font-semibold">Filter by cleaning:</div>
+                    <div class="flex gap-3">
+                        <button type="submit" name="cleaning_filter" value="all" 
+                                class="px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-sm hover:bg-gray-300 
+                                {{ $cleaningFilter === 'all' ? 'active-filter' : '' }}">
+                            All
+                        </button>
+                        <button type="submit" name="cleaning_filter" value="clean" 
+                                class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm hover:bg-green-200 
+                                {{ $cleaningFilter === 'clean' ? 'active-filter' : '' }}">
+                            Clean
+                        </button>
+                        <button type="submit" name="cleaning_filter" value="not_cleaned" 
+                                class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm hover:bg-red-200 
+                                {{ $cleaningFilter === 'not_cleaned' ? 'active-filter' : '' }}">
+                            Not Cleaned
+                        </button>
+                        <button type="submit" name="cleaning_filter" value="in_progress" 
+                                class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm hover:bg-yellow-200 
+                                {{ $cleaningFilter === 'in_progress' ? 'active-filter' : '' }}">
+                            In Progress
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="relative w-72">
+                    <input type="text" name="search" value="{{ $searchQuery ?? '' }}" placeholder="Search by room #, category, floor..." 
+                        class="w-full px-4 py-2 pl-10 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F8B803]">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    
+                    @if(!empty($searchQuery))
+                        <a href="{{ route('rooms.index', ['status_filter' => $statusFilter, 'cleaning_filter' => $cleaningFilter]) }}" 
+                           class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    @endif
                 </div>
             </div>
             
-            <!-- Search Bar -->            <div class="relative w-72">
-                <input type="text" id="room-search" placeholder="Search by room #, category, floor..." 
-                    class="w-full px-4 py-2 pl-10 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F8B803]">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </div>
-                <button id="clear-search" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600" style="display: none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                    </svg>
-                </button>
-            </div>
-        </div>
+            <!-- Add hidden inputs to preserve other filters when one button is clicked -->
+            <input type="hidden" id="active-status-filter" name="status_filter" value="{{ $statusFilter }}">
+            <input type="hidden" id="active-cleaning-filter" name="cleaning_filter" value="{{ $cleaningFilter }}">
+        </form>
     </div>
     
         <!-- Room grid display -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @forelse($rooms as $room)
-            <div class="room-box {{ $room->room_status }} border-t-4 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all" 
+            <div class="room-box {{ $room->room_status }} border-t-4 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all relative" 
                 data-status="{{ $room->room_status }}"
-                style="{{ $room->room_status == 'available' ? 'border-color: #10B981; background-color: #ECFDF5' : 
-                    ($room->room_status == 'occupied' ? 'border-color: #EF4444; background-color: #FEF2F2' : 
-                    'border-color: #6B7280; background-color: #F9FAFB') }}">
+                data-cleaning="{{ $room->cleaning_status ?? 'clean' }}"
+                data-floor="{{ $room->room_floor }}"
+                style="
+                    @if($room->room_status == 'available')
+                        border-color: #10B981 !important; background-color: #ECFDF5 !important;
+                    @elseif($room->room_status == 'occupied') 
+                        border-color: #EF4444 !important; background-color: #FEF2F2 !important;
+                    @else 
+                        border-color: #6B7280 !important; background-color: #F9FAFB !important;
+                    @endif
+                ">
+                
+                <!-- Cleaning status badges removed from top of card -->
                 
                 <div class="p-4">
                     <div class="flex justify-between items-center">
@@ -93,6 +213,14 @@
                                 {{ $room->room_status == 'available' ? 'bg-green-100 text-green-800' : 
                                 ($room->room_status == 'occupied' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
                                 {{ ucfirst($room->room_status) }}
+                            </span>
+                        </div>
+                        
+                        <div class="room-info-item">
+                            <span>Cleaning</span>
+                            <span class="font-medium room-cleaning-badge {{ $room->cleaning_status ?? 'clean' }}" 
+                                data-cleaning-status="{{ $room->cleaning_status ?? 'clean' }}">
+                                {{ ucfirst(str_replace('_', ' ', $room->cleaning_status ?? 'clean')) }}
                             </span>
                         </div>
                     </div>
@@ -153,7 +281,13 @@
         @endforelse
     </div>
     
-    <!-- Include the rooms.js script -->
-    <script src="{{ asset('js/rooms.js') }}"></script>
+    <!-- Add active filter styling -->
+    <style>
+        .active-filter {
+            font-weight: bold;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
+        }
+    </style>
 </div>
 </x-layouts.app>

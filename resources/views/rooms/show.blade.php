@@ -11,7 +11,7 @@
                     <i class="fas fa-edit mr-2"></i> Edit
                 </a>
                 <a href="{{ route('rooms.index') }}" class="px-4 py-2 bg-white text-[#1B1B18] font-medium rounded-md hover:bg-gray-100 transition duration-200 flex items-center">
-                    <i class="fas fa-arrow-left mr-2"></i> Back
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Rooms
                 </a>
             </div>
         </div>
@@ -78,6 +78,33 @@
                         </div>
                         
                         <div class="border-b pb-3">
+                            <h3 class="text-sm font-medium text-gray-500">Cleaning Status</h3>
+                            <p class="text-lg font-semibold text-[#1B1B18]">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                    {{ isset($room->cleaning_status) ? 
+                                       ($room->cleaning_status == 'clean' ? 'bg-green-100 text-green-800' : 
+                                       ($room->cleaning_status == 'not_cleaned' ? 'bg-red-100 text-red-800' : 
+                                       'bg-yellow-100 text-yellow-800')) : 'bg-green-100 text-green-800' }}">
+                                    {{ ucfirst(str_replace('_', ' ', $room->cleaning_status ?? 'clean')) }}
+                                </span>
+                                
+                                @if($room->room_status == 'available' && isset($room->cleaning_status) && $room->cleaning_status == 'not_cleaned')
+                                    <span class="ml-2 text-xs text-red-600">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        This room needs cleaning
+                                    </span>
+                                @endif
+                            </p>
+                            
+                            @if(isset($room->cleaning_notes) && !empty($room->cleaning_notes))
+                                <div class="mt-2">
+                                    <h4 class="text-xs font-medium text-gray-500">Cleaning Notes:</h4>
+                                    <p class="text-sm text-gray-700">{{ $room->cleaning_notes }}</p>
+                                </div>
+                            @endif
+                        </div>
+                        
+                        <div class="border-b pb-3">
                             <h3 class="text-sm font-medium text-gray-500">Category</h3>
                             <p class="text-lg font-semibold text-[#1B1B18]">{{ $room->roomCategory->category_name ?? 'N/A' }}</p>
                         </div>
@@ -92,93 +119,142 @@
             
             <div class="mt-8 border-t pt-6">                <h3 class="text-lg font-semibold mb-4">Actions</h3>
                 <div class="flex flex-wrap gap-3">
-                    <form action="{{ route('rooms.destroy', $room) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this room?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 transition duration-200 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                            </svg>
-                            Delete Room
-                        </button>
-                    </form>
                     
-                    @if($room->room_status == 'available')
-                        <form action="{{ route('rooms.updateStatus', $room) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="room_status" value="occupied">
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition duration-200 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                </svg>
-                                Mark as Occupied
-                            </button>
-                        </form>
+                    <!-- Room Status Actions -->
+                    <div class="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg">
+                        <h4 class="font-medium mb-3">Room Status</h4>
+                    
+                        @if($room->room_status == 'available')
+                            <form action="{{ route('rooms.updateStatus', $room) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="room_status" value="occupied">
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition duration-200 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                    Mark as Occupied
+                                </button>
+                            </form>
+                            
+                            <form action="{{ route('rooms.updateStatus', $room) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="room_status" value="maintenance">
+                                <button type="submit" class="px-4 py-2 bg-gray-600 text-white font-medium rounded-md hover:bg-gray-700 transition duration-200 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                    </svg>
+                                    Mark for Maintenance
+                                </button>
+                            </form>
+                        @elseif($room->room_status == 'occupied')
+                            <form action="{{ route('rooms.updateStatus', $room) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="room_status" value="available">
+                                <button type="submit" class="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition duration-200 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                    Mark as Available
+                                </button>
+                            </form>
+                            
+                            <form action="{{ route('rooms.updateStatus', $room) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="room_status" value="maintenance">
+                                <button type="submit" class="px-4 py-2 bg-gray-600 text-white font-medium rounded-md hover:bg-gray-700 transition duration-200 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                    </svg>
+                                    Mark for Maintenance
+                                </button>
+                            </form>
+                        @elseif($room->room_status == 'maintenance')
+                            <form action="{{ route('rooms.updateStatus', $room) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="room_status" value="available">
+                                <button type="submit" class="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition duration-200 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                                    </svg>
+                                    Mark as Available
+                                </button>
+                            </form>
+                            
+                            <form action="{{ route('rooms.updateStatus', $room) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="room_status" value="occupied">
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition duration-200 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                    Mark as Occupied
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                    
+                    <!-- Cleaning Status Actions -->
+                    <div class="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg">
+                        <h4 class="font-medium mb-3">Cleaning Status</h4>
                         
-                        <form action="{{ route('rooms.updateStatus', $room) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="room_status" value="maintenance">
-                            <button type="submit" class="px-4 py-2 bg-gray-600 text-white font-medium rounded-md hover:bg-gray-700 transition duration-200 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
-                                </svg>
-                                Mark for Maintenance
-                            </button>
-                        </form>
-                    @elseif($room->room_status == 'occupied')
-                        <form action="{{ route('rooms.updateStatus', $room) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="room_status" value="available">
-                            <button type="submit" class="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition duration-200 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                </svg>
-                                Mark as Available
-                            </button>
-                        </form>
+                        <div class="flex space-x-2 mb-3">
+                            <form action="{{ route('rooms.updateCleaningStatus', $room) }}" method="POST" class="flex-1">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="cleaning_status" value="clean">
+                                <button type="submit" class="w-full px-2 py-2 {{ $room->cleaning_status == 'clean' ? 'bg-green-700' : 'bg-green-600' }} text-white font-medium rounded-md hover:bg-green-700 transition duration-200 flex items-center justify-center">
+                                    <i class="fas fa-check-circle mr-2"></i> Clean
+                                </button>
+                            </form>
+                            
+                            <form action="{{ route('rooms.updateCleaningStatus', $room) }}" method="POST" class="flex-1">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="cleaning_status" value="not_cleaned">
+                                <button type="submit" class="w-full px-2 py-2 {{ $room->cleaning_status == 'not_cleaned' ? 'bg-red-700' : 'bg-red-600' }} text-white font-medium rounded-md hover:bg-red-700 transition duration-200 flex items-center justify-center">
+                                    <i class="fas fa-times-circle mr-2"></i> Not Cleaned
+                                </button>
+                            </form>
+                            
+                            <form action="{{ route('rooms.updateCleaningStatus', $room) }}" method="POST" class="flex-1">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="cleaning_status" value="in_progress">
+                                <button type="submit" class="w-full px-2 py-2 {{ $room->cleaning_status == 'in_progress' ? 'bg-yellow-700' : 'bg-yellow-600' }} text-white font-medium rounded-md hover:bg-yellow-700 transition duration-200 flex items-center justify-center">
+                                    <i class="fas fa-clock mr-2"></i> In Progress
+                                </button>
+                            </form>
+                        </div>
                         
-                        <form action="{{ route('rooms.updateStatus', $room) }}" method="POST">
+                        <form action="{{ route('rooms.updateCleaningStatus', $room) }}" method="POST" class="mt-4">
                             @csrf
                             @method('PATCH')
-                            <input type="hidden" name="room_status" value="maintenance">
-                            <button type="submit" class="px-4 py-2 bg-gray-600 text-white font-medium rounded-md hover:bg-gray-700 transition duration-200 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
-                                </svg>
-                                Mark for Maintenance
-                            </button>
+                            <input type="hidden" name="cleaning_status" value="{{ $room->cleaning_status ?? 'clean' }}">
+                            <div class="flex flex-col">
+                                <label for="cleaning_notes" class="mb-1 text-sm font-medium text-gray-700">Cleaning Notes:</label>
+                                <div class="flex">
+                                    <input type="text" id="cleaning_notes" name="cleaning_notes" placeholder="Add cleaning notes..." 
+                                           class="flex-grow px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-[#F8B803]"
+                                           value="{{ $room->cleaning_notes }}">
+                                    <button type="submit" class="px-4 py-2 bg-[#F8B803] text-[#1B1B18] rounded-r-md hover:bg-yellow-500">
+                                        Save Notes
+                                    </button>
+                                </div>
+                            </div>
                         </form>
-                    @elseif($room->room_status == 'maintenance')
-                        <form action="{{ route('rooms.updateStatus', $room) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="room_status" value="available">
-                            <button type="submit" class="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition duration-200 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
-                                </svg>
-                                Mark as Available
-                            </button>
-                        </form>
-                        
-                        <form action="{{ route('rooms.updateStatus', $room) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="room_status" value="occupied">
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition duration-200 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                </svg>
-                                Mark as Occupied
-                            </button>
-                        </form>
-                    @endif
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Include script to maintain room colors when changing cleaning status -->
+<script src="{{ asset('js/room-cleaning-updates.js') }}"></script>
 </x-layouts.app>
