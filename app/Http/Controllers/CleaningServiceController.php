@@ -9,12 +9,37 @@ use Illuminate\Http\Request;
 class CleaningServiceController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource with filtering.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $cleaning=Room::all();
-        return view('cleaning.index', compact('cleaning'));
+        $query = Room::query();
+        
+       
+        if ($request->has('cleaning_filter') && $request->cleaning_filter !== 'all') {
+            $query->where('cleaning_status', $request->cleaning_filter);
+        }
+        
+        
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('room_number', 'like', "%{$search}%")
+                  ->orWhere('room_floor', 'like', "%{$search}%");
+            });
+        }
+        
+
+        $cleaningFilter = $request->cleaning_filter ?? 'all';
+        $searchQuery = $request->search ?? '';
+        
+        $cleaning = $query->get();
+        
+        return view('cleaning.index', compact(
+            'cleaning', 
+            'cleaningFilter', 
+            'searchQuery'
+        ));
     }
 
     /**

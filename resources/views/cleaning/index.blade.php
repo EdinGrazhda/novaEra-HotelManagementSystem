@@ -8,6 +8,58 @@
 <!-- Add CSRF Token meta tag -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
+<!-- Handle filter form submission -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle form submission and preserve other filters
+        const form = document.querySelector('.cleaning-filter-form');
+        const searchInput = form.querySelector('input[name="search"]');
+        
+        // Handle filter button clicks
+        document.querySelectorAll('button[name="cleaning_filter"]').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Get the value
+                const value = this.getAttribute('value');
+                
+                // Create or update form parameters
+                const formData = new FormData(form);
+                formData.set('cleaning_filter', value);
+                
+                // Build the URL with all parameters
+                let url = form.action + '?';
+                for (const [key, val] of formData.entries()) {
+                    if (val) {
+                        url += encodeURIComponent(key) + '=' + encodeURIComponent(val) + '&';
+                    }
+                }
+                
+                // Navigate to the filtered URL
+                window.location.href = url.slice(0, -1);  // Remove trailing &
+            });
+        });
+        
+        // Handle search submit to preserve selected filters
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Build URL with all current parameters
+            const formData = new FormData(form);
+            let url = form.action + '?';
+            
+            for (const [key, val] of formData.entries()) {
+                if (val) {
+                    url += encodeURIComponent(key) + '=' + encodeURIComponent(val) + '&';
+                }
+            }
+            
+            // Navigate to the filtered URL
+            window.location.href = url.slice(0, -1);  // Remove trailing &
+        });
+    });
+</script>
+
 <div class="container mx-auto px-4 py-8">
     <div class="mb-6 flex justify-between items-center">
         <h1 class="text-2xl font-bold text-[#1B1B18]">Cleaning Management</h1>
@@ -53,35 +105,60 @@
         </script>
     @endif
     
-    <!-- Cleaning filter controls -->
+    <!-- Cleaning filter controls with Laravel -->
     <div class="mb-6 bg-white rounded-lg shadow-sm p-4">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="flex flex-wrap items-center gap-4">
-                <div class="font-semibold">Filter by cleaning status:</div>
-                <div class="flex gap-3">
-                    <button data-filter="all" class="filter-btn active-filter px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-sm hover:bg-gray-300">All</button>
-                    <button data-filter="clean" class="filter-btn px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm hover:bg-green-200">Clean</button>
-                    <button data-filter="not_cleaned" class="filter-btn px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm hover:bg-red-200">Not Cleaned</button>
-                    <button data-filter="in_progress" class="filter-btn px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm hover:bg-yellow-200">In Progress</button>
+        <form action="{{ route('cleaning.index') }}" method="GET" class="cleaning-filter-form">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-4">
+                    <div class="font-semibold">Filter by cleaning status:</div>
+                    <div class="grid grid-cols-4 gap-3">
+                        <button type="submit" name="cleaning_filter" value="all" 
+                                class="h-8 px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-sm hover:bg-gray-300 flex items-center justify-center
+                                {{ $cleaningFilter === 'all' ? 'active-filter' : '' }}">
+                            All
+                        </button>
+                        <button type="submit" name="cleaning_filter" value="clean" 
+                                class="h-8 px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm hover:bg-green-200 flex items-center justify-center
+                                {{ $cleaningFilter === 'clean' ? 'active-filter' : '' }}">
+                            Clean
+                        </button>
+                        <button type="submit" name="cleaning_filter" value="not_cleaned" 
+                                class="h-8 px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm hover:bg-red-200 flex items-center justify-center
+                                {{ $cleaningFilter === 'not_cleaned' ? 'active-filter' : '' }}">
+                            Not Cleaned
+                        </button>
+                        <button type="submit" name="cleaning_filter" value="in_progress" 
+                                class="h-8 px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm hover:bg-yellow-200 flex items-center justify-center
+                                {{ $cleaningFilter === 'in_progress' ? 'active-filter' : '' }}">
+                            In Progress
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="relative w-72">
+                    <input type="text" name="search" value="{{ $searchQuery ?? '' }}" placeholder="Search by room #, floor..." 
+                        class="w-full px-4 py-2 pl-10 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F8B803]">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    
+                    @if(!empty($searchQuery))
+                        <a href="{{ route('cleaning.index', ['cleaning_filter' => $cleaningFilter]) }}" 
+                           class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    @endif
                 </div>
             </div>
             
-            <!-- Search Bar -->
-            <div class="relative w-72">
-                <input type="text" id="room-search" placeholder="Search by room #, floor..." 
-                    class="w-full px-4 py-2 pl-10 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F8B803]">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </div>
-                <button id="clear-search" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600" style="display: none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                    </svg>
-                </button>
-            </div>
-        </div>
+            <!-- Add hidden input to preserve filter when search is used -->
+            <input type="hidden" id="active-cleaning-filter" name="cleaning_filter" value="{{ $cleaningFilter }}">
+        </form>
     </div>
       <!-- Room grid display for cleaning -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -196,109 +273,13 @@
             </div>
         @endforelse
     </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get all necessary elements
-            const searchInput = document.getElementById('room-search');
-            const clearButton = document.getElementById('clear-search');
-            const roomBoxes = document.querySelectorAll('.room-box');
-            const filterButtons = document.querySelectorAll('.filter-btn');
-            
-            let currentFilter = 'all'; // Track current filter state
-            
-            // Debug log for room boxes
-            console.log("Room boxes and their cleaning statuses:");
-            roomBoxes.forEach(room => {
-                const roomNumber = room.querySelector('.room-number').textContent;
-                const cleaningStatus = room.getAttribute('data-cleaning');
-                console.log(`Room ${roomNumber}: ${cleaningStatus}`);
-            });
-            
-            // Search functionality
-            function filterRoomsBySearch() {
-                const searchTerm = searchInput.value.toLowerCase();
-                
-                roomBoxes.forEach(room => {
-                    const roomNumber = room.querySelector('.room-number').textContent.toLowerCase();
-                    const roomFloor = room.getAttribute('data-floor') || '';
-                    const shouldShowByFilter = currentFilter === 'all' || room.getAttribute('data-cleaning') === currentFilter;
-                    
-                    // Only apply search filter to rooms that pass the cleaning status filter
-                    if (shouldShowByFilter) {
-                        if (roomNumber.includes(searchTerm) || roomFloor.toLowerCase().includes(searchTerm)) {
-                            room.style.display = '';
-                        } else {
-                            room.style.display = 'none';
-                        }
-                    }
-                });
-            }
-            
-            // Filter functionality by cleaning status
-            function filterRoomsByStatus(filter) {
-                console.log(`Filtering rooms by status: ${filter}`);
-                currentFilter = filter;
-                
-                roomBoxes.forEach(room => {
-                    const cleaningStatus = room.getAttribute('data-cleaning');
-                    console.log(`Room ${room.querySelector('.room-number').textContent}: status=${cleaningStatus}, filter=${filter}`);
-                    
-                    if (filter === 'all' || cleaningStatus === filter) {
-                        room.style.display = '';
-                    } else {
-                        room.style.display = 'none';
-                    }
-                });
-                
-                // Re-apply search filter on top of cleaning status filter
-                if (searchInput && searchInput.value) {
-                    filterRoomsBySearch();
-                }
-            }
-            
-            // Set up search event listener
-            if (searchInput) {
-                searchInput.addEventListener('input', filterRoomsBySearch);
-                
-                // Show/hide clear button based on search input
-                searchInput.addEventListener('input', function() {
-                    if (this.value.length > 0 && clearButton) {
-                        clearButton.style.display = 'flex';
-                    } else if (clearButton) {
-                        clearButton.style.display = 'none';
-                    }
-                });
-            }
-            
-            // Set up clear button functionality
-            if (clearButton) {
-                clearButton.addEventListener('click', function() {
-                    if (searchInput) {
-                        searchInput.value = '';
-                        clearButton.style.display = 'none';
-                        filterRoomsByStatus(currentFilter); // Reset to current filter state
-                    }
-                });
-            }
-            
-            // Set up filter button event listeners
-            filterButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const filter = this.getAttribute('data-filter');
-                    
-                    // Update active button
-                    filterButtons.forEach(btn => btn.classList.remove('active-filter'));
-                    this.classList.add('active-filter');
-                    
-                    // Apply the filter
-                    filterRoomsByStatus(filter);
-                });
-            });
-        });
-    </script>
-    
-    <!-- Include room color manager only -->
-    <script src="{{ asset('js/room-color-manager.js') }}"></script>
+      <!-- Add active filter styling -->
+    <style>
+        .active-filter {
+            font-weight: bold;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
+        }
+    </style>
 </div>
 </x-layouts.app>

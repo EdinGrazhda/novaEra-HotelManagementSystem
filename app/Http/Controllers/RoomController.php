@@ -21,12 +21,47 @@ class RoomController extends Controller
     }
 
     /**
-     * Display a listing of the rooms.
+     * Display a listing of the rooms with filtering.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $rooms = Room::with('category')->get();
-        return view('rooms.index', compact('rooms'));
+        $query = Room::with('category');
+        
+        // Apply status filter
+        if ($request->has('status_filter') && $request->status_filter !== 'all') {
+            $query->where('room_status', $request->status_filter);
+        }
+        
+        // Apply cleaning status filter
+        if ($request->has('cleaning_filter') && $request->cleaning_filter !== 'all') {
+            $query->where('cleaning_status', $request->cleaning_filter);
+        }
+        
+        // Apply search filter
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('room_number', 'like', "%{$search}%")
+                  ->orWhere('room_floor', 'like', "%{$search}%")
+                  ->orWhereHas('roomCategory', function($q2) use ($search) {
+                      $q2->where('category_name', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        // Get selected filters for UI highlighting
+        $statusFilter = $request->status_filter ?? 'all';
+        $cleaningFilter = $request->cleaning_filter ?? 'all'; 
+        $searchQuery = $request->search ?? '';
+        
+        $rooms = $query->get();
+        
+        return view('rooms.index', compact(
+            'rooms', 
+            'statusFilter', 
+            'cleaningFilter', 
+            'searchQuery'
+        ));
     }
 
     /**
