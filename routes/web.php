@@ -46,6 +46,13 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('menu/{menu}', [MenuController::class, 'destroy'])->name('menu.destroy');
     
 
+    //Menu Service
+    Route::get('menuService', [App\Http\Controllers\MenuServiceController::class, 'index'])->name('menuService.index');
+    Route::post('menuService', [App\Http\Controllers\MenuServiceController::class, 'store'])->name('menuService.store');
+    Route::patch('menuService/{roomMenuOrder}/update-status', [App\Http\Controllers\MenuServiceController::class, 'updateStatus'])->name('menuService.updateStatus');
+    Route::delete('menuService/{roomMenuOrder}', [App\Http\Controllers\MenuServiceController::class, 'destroy'])->name('menuService.destroy');
+    Route::delete('menuService/{order}', [App\Http\Controllers\MenuServiceController::class, 'destroy'])->name('menuService.destroy');
+
 });
 
 require __DIR__.'/auth.php';

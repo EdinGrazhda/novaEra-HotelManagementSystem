@@ -23,9 +23,21 @@ class Room extends Model
     {
         return $this->belongsTo(RoomCategory::class, 'room_category_id');
     }
-    public function menus(){
-        return $this->hasMany(Menu::class);
+    
+    // Relationship to menu items through RoomMenuOrder
+    public function menuOrders()
+    {
+        return $this->hasMany(RoomMenuOrder::class);
     }
+    
+    // Direct relationship to Menu (if applicable)
+    public function menus()
+    {
+        return $this->belongsToMany(Menu::class, 'room_menu_orders')
+                    ->withPivot('quantity', 'status', 'notes')
+                    ->withTimestamps();
+    }
+    
     // This is an alias for the roomCategory relation to make it easier to use in views
     public function category()
     {
