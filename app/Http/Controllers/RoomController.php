@@ -213,4 +213,30 @@ class RoomController extends Controller
         return redirect()->route('rooms.index')
                         ->with('success', 'Room deleted successfully');
     }
+    
+    /**
+     * Update the room check-in status.
+     */
+    public function checkIn(Room $room)
+    {
+        $room->update([
+            'checkin_status' => 'checked_in',
+            'checkin_time' => now(),
+        ]);
+        
+        return redirect()->back()->with('success', 'Room has been checked in successfully.');
+    }
+    
+    /**
+     * Update the room check-out status.
+     */
+    public function checkOut(Room $room)
+    {
+        $room->update([
+            'checkout_status' => 'checked_out',
+            'checkout_time' => now(),
+        ]);
+        
+        return redirect()->back()->with('success', 'Room has been checked out successfully.');
+    }
 }

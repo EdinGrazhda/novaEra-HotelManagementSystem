@@ -17,6 +17,10 @@ class Room extends Model
         'room_category_id',
         'cleaning_status',
         'cleaning_notes',
+        'checkin_status',
+        'checkout_status',
+        'checkin_time',
+        'checkout_time',
     ];
 
     public function roomCategory()
@@ -42,5 +46,37 @@ class Room extends Model
     public function category()
     {
         return $this->roomCategory();
+    }
+    
+    /**
+     * Get a human-readable check-in status
+     */
+    public function getCheckInStatusLabelAttribute()
+    {
+        return $this->checkin_status == 'checked_in' ? 'Checked In' : 'Not Checked In';
+    }
+    
+    /**
+     * Get a human-readable check-out status
+     */
+    public function getCheckOutStatusLabelAttribute()
+    {
+        return $this->checkout_status == 'checked_out' ? 'Checked Out' : 'Not Checked Out';
+    }
+    
+    /**
+     * Get formatted check-in time
+     */
+    public function getFormattedCheckinTimeAttribute()
+    {
+        return $this->checkin_time ? \Carbon\Carbon::parse($this->checkin_time)->format('M d, Y g:i A') : 'N/A';
+    }
+    
+    /**
+     * Get formatted check-out time
+     */
+    public function getFormattedCheckoutTimeAttribute()
+    {
+        return $this->checkout_time ? \Carbon\Carbon::parse($this->checkout_time)->format('M d, Y g:i A') : 'N/A';
     }
 }

@@ -223,6 +223,20 @@
                                 {{ ucfirst(str_replace('_', ' ', $room->cleaning_status ?? 'clean')) }}
                             </span>
                         </div>
+                        
+                        <!-- Combined Check-in/Check-out status -->
+                        <div class="room-info-item">
+                            <span>Check Status</span>
+                            <span class="font-medium">
+                                <span class="{{ $room->checkin_status == 'checked_in' ? 'text-green-600' : 'text-gray-600' }} mr-1">
+                                    <i class="fas fa-sign-in-alt"></i> {{ $room->checkin_status == 'checked_in' ? 'In' : 'Not In' }}
+                                </span>
+                                /
+                                <span class="{{ $room->checkout_status == 'checked_out' ? 'text-blue-600' : 'text-gray-600' }} ml-1">
+                                    <i class="fas fa-sign-out-alt"></i> {{ $room->checkout_status == 'checked_out' ? 'Out' : 'Not Out' }}
+                                </span>
+                            </span>
+                        </div>
                     </div>
                 </div>
                 
