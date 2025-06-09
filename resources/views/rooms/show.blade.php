@@ -109,6 +109,36 @@
                             <p class="text-lg font-semibold text-[#1B1B18]">{{ $room->roomCategory->category_name ?? 'N/A' }}</p>
                         </div>
                         
+                        <div class="border-b pb-3">
+                            <h3 class="text-sm font-medium text-gray-500">Check-in Status</h3>
+                            <p class="text-lg font-semibold">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                    {{ $room->checkin_status == 'checked_in' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                    {{ $room->checkin_status == 'checked_in' ? 'Checked In' : 'Not Checked In' }}
+                                </span>
+                            </p>
+                            @if($room->checkin_time)
+                                <p class="text-sm text-gray-500 mt-1">
+                                    Check-in Time: {{ \Carbon\Carbon::parse($room->checkin_time)->format('M d, Y g:i A') }}
+                                </p>
+                            @endif
+                        </div>
+                        
+                        <div class="border-b pb-3">
+                            <h3 class="text-sm font-medium text-gray-500">Check-out Status</h3>
+                            <p class="text-lg font-semibold">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                    {{ $room->checkout_status == 'checked_out' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
+                                    {{ $room->checkout_status == 'checked_out' ? 'Checked Out' : 'Not Checked Out' }}
+                                </span>
+                            </p>
+                            @if($room->checkout_time)
+                                <p class="text-sm text-gray-500 mt-1">
+                                    Check-out Time: {{ \Carbon\Carbon::parse($room->checkout_time)->format('M d, Y g:i A') }}
+                                </p>
+                            @endif
+                        </div>
+                        
                         <div>
                             <h3 class="text-sm font-medium text-gray-500">Description</h3>
                             <p class="text-gray-700">{{ $room->room_description ?: 'No description available.' }}</p>
@@ -119,6 +149,40 @@
             
             <div class="mt-8 border-t pt-6">                <h3 class="text-lg font-semibold mb-4">Actions</h3>
                 <div class="flex flex-wrap gap-3">
+                    
+                    <!-- Check-in/Check-out Actions -->
+                    <div class="w-full p-4 mb-3 bg-gray-50 rounded-lg">
+                        <h4 class="font-medium mb-3">Check-in / Check-out Actions</h4>
+                        <div class="flex space-x-3">
+                            @if($room->checkin_status != 'checked_in')
+                                <form action="{{ route('rooms.checkIn', $room) }}" method="POST">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition duration-200 flex items-center">
+                                        <i class="fas fa-sign-in-alt mr-2"></i> Check-in
+                                    </button>
+                                </form>
+                            @else
+                                <button disabled class="px-4 py-2 bg-gray-400 text-white font-medium rounded-md cursor-not-allowed flex items-center">
+                                    <i class="fas fa-sign-in-alt mr-2"></i> Already Checked-in
+                                </button>
+                            @endif
+                            
+                            @if($room->checkin_status == 'checked_in' && $room->checkout_status != 'checked_out')
+                                <form action="{{ route('rooms.checkOut', $room) }}" method="POST">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition duration-200 flex items-center">
+                                        <i class="fas fa-sign-out-alt mr-2"></i> Check-out
+                                    </button>
+                                </form>
+                            @elseif($room->checkout_status == 'checked_out')
+                                <button disabled class="px-4 py-2 bg-gray-400 text-white font-medium rounded-md cursor-not-allowed flex items-center">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Already Checked-out
+                                </button>
+                            @endif
+                        </div>
+                    </div>
                     
                     <!-- Room Status Actions -->
                     <div class="w-full md:w-1/2 p-4 bg-gray-50 rounded-lg">

@@ -77,6 +77,36 @@
                         class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F8B803]" 
                         placeholder="Enter room description">{{ old('room_description', $room->room_description) }}</textarea>
                 </div>
+                
+                <div>
+                    <label for="checkin_status" class="block text-sm font-medium text-gray-700 mb-1">Check-in Status</label>
+                    <select name="checkin_status" id="checkin_status" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F8B803]">
+                        <option value="not_checked_in" {{ old('checkin_status', $room->checkin_status) == 'not_checked_in' ? 'selected' : '' }}>Not Checked In</option>
+                        <option value="checked_in" {{ old('checkin_status', $room->checkin_status) == 'checked_in' ? 'selected' : '' }}>Checked In</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="checkout_status" class="block text-sm font-medium text-gray-700 mb-1">Check-out Status</label>
+                    <select name="checkout_status" id="checkout_status" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F8B803]">
+                        <option value="not_checked_out" {{ old('checkout_status', $room->checkout_status) == 'not_checked_out' ? 'selected' : '' }}>Not Checked Out</option>
+                        <option value="checked_out" {{ old('checkout_status', $room->checkout_status) == 'checked_out' ? 'selected' : '' }}>Checked Out</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="checkin_time" class="block text-sm font-medium text-gray-700 mb-1">Check-in Time</label>
+                    <input type="datetime-local" name="checkin_time" id="checkin_time" value="{{ old('checkin_time', $room->checkin_time ? date('Y-m-d\TH:i', strtotime($room->checkin_time)) : '') }}" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F8B803]">
+                </div>
+                
+                <div>
+                    <label for="checkout_time" class="block text-sm font-medium text-gray-700 mb-1">Check-out Time</label>
+                    <input type="datetime-local" name="checkout_time" id="checkout_time" value="{{ old('checkout_time', $room->checkout_time ? date('Y-m-d\TH:i', strtotime($room->checkout_time)) : '') }}" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F8B803]">
+                </div>
             </div>
             
             <div class="flex justify-end mt-6 space-x-3">
