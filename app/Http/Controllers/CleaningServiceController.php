@@ -15,23 +15,26 @@ class CleaningServiceController extends Controller
     {
         $query = Room::query();
         
-       
-        if ($request->has('cleaning_filter') && $request->cleaning_filter !== 'all') {
-            $query->where('cleaning_status', $request->cleaning_filter);
+        // Support both URL parameter formats (cleaning_filter from traditional filters and cleaningFilter from Livewire)
+        $cleaningFilter = $request->cleaning_filter ?? $request->cleaningFilter ?? 'all';
+        $searchQuery = $request->search ?? $request->searchQuery ?? '';
+        
+        // Apply cleaning filter
+        if ($cleaningFilter && $cleaningFilter !== 'all') {
+            $query->where('cleaning_status', $cleaningFilter);
         }
         
-        
-        if ($request->has('search') && !empty($request->search)) {
-            $search = $request->search;
+        // Apply search filter
+        if (!empty($searchQuery)) {
+            $search = $searchQuery;
             $query->where(function($q) use ($search) {
                 $q->where('room_number', 'like', "%{$search}%")
-                  ->orWhere('room_floor', 'like', "%{$search}%");
+                  ->orWhere('room_floor', 'like', "%{$search}%")
+                  ->orWhereHas('roomCategory', function($q2) use ($search) {
+                      $q2->where('category_name', 'like', "%{$search}%");
+                  });
             });
         }
-        
-
-        $cleaningFilter = $request->cleaning_filter ?? 'all';
-        $searchQuery = $request->search ?? '';
         
         $cleaning = $query->get();
         

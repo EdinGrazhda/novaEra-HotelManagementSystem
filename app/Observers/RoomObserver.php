@@ -38,5 +38,12 @@ class RoomObserver
             
             $room->cleaning_status = 'clean';
         }
+        
+        // If checkout_status is changing to checked_out, set the cleaning status to "not_cleaned"
+        if ($room->isDirty('checkout_status') && 
+            $room->checkout_status === 'checked_out') {
+            
+            $room->cleaning_status = 'not_cleaned';
+        }
     }
 }

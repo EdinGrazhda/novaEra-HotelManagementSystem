@@ -27,19 +27,24 @@ class RoomController extends Controller
     {
         $query = Room::with('category');
         
+        // Support both URL parameter formats (status_filter from traditional filters and statusFilter from Livewire)
+        $statusFilter = $request->status_filter ?? $request->statusFilter ?? 'all';
+        $cleaningFilter = $request->cleaning_filter ?? $request->cleaningFilter ?? 'all';
+        $searchQuery = $request->search ?? $request->searchQuery ?? '';
+        
         // Apply status filter
-        if ($request->has('status_filter') && $request->status_filter !== 'all') {
-            $query->where('room_status', $request->status_filter);
+        if ($statusFilter && $statusFilter !== 'all') {
+            $query->where('room_status', $statusFilter);
         }
         
         // Apply cleaning status filter
-        if ($request->has('cleaning_filter') && $request->cleaning_filter !== 'all') {
-            $query->where('cleaning_status', $request->cleaning_filter);
+        if ($cleaningFilter && $cleaningFilter !== 'all') {
+            $query->where('cleaning_status', $cleaningFilter);
         }
         
         // Apply search filter
-        if ($request->has('search') && !empty($request->search)) {
-            $search = $request->search;
+        if (!empty($searchQuery)) {
+            $search = $searchQuery;
             $query->where(function($q) use ($search) {
                 $q->where('room_number', 'like', "%{$search}%")
                   ->orWhere('room_floor', 'like', "%{$search}%")
@@ -48,11 +53,6 @@ class RoomController extends Controller
                   });
             });
         }
-        
-        // Get selected filters for UI highlighting
-        $statusFilter = $request->status_filter ?? 'all';
-        $cleaningFilter = $request->cleaning_filter ?? 'all'; 
-        $searchQuery = $request->search ?? '';
         
         $rooms = $query->get();
         
@@ -237,6 +237,9 @@ class RoomController extends Controller
             'checkout_time' => now(),
         ]);
         
-        return redirect()->back()->with('success', 'Room has been checked out successfully.');
+        // Dispatch Livewire events to refresh both room status and cleaning status lists
+        event(new \Illuminate\Database\Eloquent\Events\Updated($room));
+        
+        return redirect()->back()->with('success', 'Room has been checked out successfully. Cleaning status set to not cleaned.');
     }
 }
