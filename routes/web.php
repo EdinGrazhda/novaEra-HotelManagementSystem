@@ -7,12 +7,15 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Appearance;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\CalendarController;
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::redirect('dashboard', 'rooms/dashboard')
+Route::get('dashboard', function () {
+    return view('dashboard');
+})
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
@@ -26,7 +29,7 @@ Route::middleware(['auth'])->group(function () {
 
     //Rooms
     Route::get('rooms', [RoomController::class, 'index'])->name('rooms.index');
-    Route::get('rooms/dashboard', [RoomController::class, 'dashboard'])->name('rooms.dashboard');
+    Route::get('rooms/dashboard', App\Livewire\Dashboard::class)->name('rooms.dashboard');
     Route::patch('rooms/{room}/status', [RoomController::class, 'updateStatus'])->name('rooms.updateStatus');
     Route::patch('rooms/{room}/cleaning-status', [RoomController::class, 'updateCleaningStatus'])->name('rooms.updateCleaningStatus');
     Route::patch('rooms/{room}/check-in', [RoomController::class, 'checkIn'])->name('rooms.checkIn');
@@ -53,8 +56,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('menuService', [App\Http\Controllers\MenuServiceController::class, 'store'])->name('menuService.store');
     Route::patch('menuService/{roomMenuOrder}/update-status', [App\Http\Controllers\MenuServiceController::class, 'updateStatus'])->name('menuService.updateStatus');
     Route::delete('menuService/{roomMenuOrder}', [App\Http\Controllers\MenuServiceController::class, 'destroy'])->name('menuService.destroy');
-    Route::delete('menuService/{order}', [App\Http\Controllers\MenuServiceController::class, 'destroy'])->name('menuService.destroy');
-
+    
+    // Room Calendar
+    Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
 });
 
 require __DIR__.'/auth.php';

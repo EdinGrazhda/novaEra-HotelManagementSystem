@@ -11,7 +11,8 @@ class RoomObserver
      *
      * @param  \App\Models\Room  $room
      * @return void
-     */    public function updating(Room $room)
+     */
+    public function updating(Room $room)
     {
         // If the room status is changing from occupied to available (checkout),
         // set the cleaning status to "not_cleaned"
@@ -45,5 +46,16 @@ class RoomObserver
             
             $room->cleaning_status = 'not_cleaned';
         }
+    }
+    
+    /**
+     * Handle the Room "updated" event.
+     *
+     * @param  \App\Models\Room  $room
+     * @return void
+     */
+    public function updated(Room $room)
+    {
+        // This method can be used for additional logic when a room is updated
     }
 }

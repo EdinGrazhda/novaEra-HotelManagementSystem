@@ -85,7 +85,7 @@ class RoomStatusList extends Component
         $room->checkout_status = 'checked_out';
         $room->checkout_time = now();
         $room->room_status = 'available';
-        $room->cleaning_status = 'not_cleaned'; // Mark for cleaning after checkout
+        $room->cleaning_status = 'not_cleaned'; 
         $room->save();
         
         $this->dispatch('statusUpdated', roomId: $roomId, action: 'checkout');

@@ -5,19 +5,91 @@ namespace App\Http\Controllers;
 use App\Models\Room;
 use App\Models\RoomCategory;
 use Illuminate\Http\Request;
+use App\Models\RoomMenuOrder;
 
 class RoomController extends Controller
 {
     /**
-     * Display the rooms dashboard
+     * Display the rooms dashboard with comprehensive statistics
      */
     public function dashboard()
     {
+        // Basic room counts
         $totalRooms = Room::count();
         $availableRooms = Room::where('room_status', 'available')->count();
         $occupiedRooms = Room::where('room_status', 'occupied')->count();
+        $maintenanceRooms = Room::where('room_status', 'maintenance')->count();
         
-        return view('rooms.dashboard', compact('totalRooms', 'availableRooms', 'occupiedRooms'));
+        // Cleaning status counts
+        $cleanRooms = Room::where('cleaning_status', 'clean')->count();
+        $notCleanedRooms = Room::where('cleaning_status', 'not_cleaned')->count();
+        $inProgressCleaningRooms = Room::where('cleaning_status', 'in_progress')->count();
+        
+        // Check-in/Check-out statistics
+        $checkedInToday = Room::whereDate('checkin_time', now()->toDateString())->count();
+        $checkedOutToday = Room::whereDate('checkout_time', now()->toDateString())->count();
+        $pendingCheckouts = Room::where('checkin_status', 'checked_in')
+            ->where('checkout_status', '!=', 'checked_out')
+            ->count();
+        
+        // Menu order statistics
+        $totalFoodOrders = RoomMenuOrder::count();
+        $activeOrders = RoomMenuOrder::where('status', '!=', 'delivered')->count();
+        $deliveredOrders = RoomMenuOrder::where('status', 'delivered')->count();
+        
+        // Monthly statistics for check-ins and check-outs (for charts)
+        $monthlyData = [];
+        $currentMonth = now()->startOfMonth();
+        
+        // Get data for the last 6 months and reverse to show chronologically
+        for ($i = 5; $i >= 0; $i--) {
+            $month = $currentMonth->copy()->subMonths($i);
+            $monthName = $month->format('M Y');
+            
+            $monthlyCheckins = Room::whereMonth('checkin_time', $month->month)
+                ->whereYear('checkin_time', $month->year)
+                ->count();
+                
+            $monthlyCheckouts = Room::whereMonth('checkout_time', $month->month)
+                ->whereYear('checkout_time', $month->year)
+                ->count();
+                
+            $monthlyData[] = [
+                'month' => $monthName,
+                'checkins' => $monthlyCheckins,
+                'checkouts' => $monthlyCheckouts
+            ];
+        }
+        
+        // Room category distribution
+        $roomsByCategory = Room::with('roomCategory')
+            ->get()
+            ->groupBy('roomCategory.category_name')
+            ->map(function($items, $key) {
+                return [
+                    'category' => $key ?? 'Uncategorized',
+                    'count' => $items->count()
+                ];
+            })
+            ->values();
+        
+        return view('rooms.dashboard', compact(
+            'totalRooms', 
+            'availableRooms', 
+            'occupiedRooms', 
+            'maintenanceRooms',
+            'cleanRooms',
+            'notCleanedRooms',
+            'inProgressCleaningRooms', 
+            'checkedInToday',
+            'checkedOutToday',
+            'pendingCheckouts',
+            'totalFoodOrders',
+            'activeOrders',
+            'deliveredOrders',
+            'monthlyData',
+            'roomsByCategory'
+        ));
     }
 
     /**
@@ -208,10 +280,19 @@ class RoomController extends Controller
      */
     public function destroy(Room $room)
     {
-        $room->delete();
+        try {
+            // Delete any related room menu orders first
+            $room->menuOrders()->delete();
+            
+            // Now we can safely delete the room
+            $room->delete();
 
-        return redirect()->route('rooms.index')
-                        ->with('success', 'Room deleted successfully');
+            return redirect()->route('rooms.index')
+                            ->with('success', 'Room and all related orders deleted successfully');
+        } catch (\Exception $e) {
+            return redirect()->route('rooms.index')
+                            ->with('error', 'Failed to delete room: ' . $e->getMessage());
+        }
     }
     
     /**
