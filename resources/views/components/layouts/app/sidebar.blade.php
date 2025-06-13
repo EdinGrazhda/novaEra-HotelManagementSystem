@@ -34,6 +34,13 @@
                         {{ __('Menu Service') }}
                     </flux:navlist.item>
                     
+                    <flux:navlist.item 
+                        icon="calendar" 
+                        :href="route('calendar.index')" 
+                        :current="request()->routeIs('calendar.index')" >
+                        {{ __('Room Calendar') }}
+                    </flux:navlist.item>
+                    
                 </flux:navlist.group>
                 
             </flux:navlist>

@@ -31,7 +31,7 @@ class CleaningStatusList extends Component
     {
         $this->dispatch('filterChanged');
         
-        // Update URL parameter when filter changes
+       
         $this->dispatch('urlChanged', [
             'cleaningFilter' => $this->cleaningFilter !== 'all' ? $this->cleaningFilter : null,
             'searchQuery' => !empty($this->searchQuery) ? $this->searchQuery : null
@@ -42,7 +42,7 @@ class CleaningStatusList extends Component
     {
         $this->dispatch('filterChanged');
         
-        // Update URL parameter when search changes
+        
         $this->dispatch('urlChanged', [
             'cleaningFilter' => $this->cleaningFilter !== 'all' ? $this->cleaningFilter : null,
             'searchQuery' => !empty($this->searchQuery) ? $this->searchQuery : null

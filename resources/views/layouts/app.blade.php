@@ -45,6 +45,7 @@
                         @auth
                             <a href="{{ route('dashboard') }}" class="text-[#706F6C] hover:text-[#F8B803]">Dashboard</a>
                             <a href="{{ route('rooms.index') }}" class="text-[#706F6C] hover:text-[#F8B803]">Rooms</a>
+                            <a href="{{ route('calendar.index') }}" class="text-[#706F6C] hover:text-[#F8B803]">Calendar</a>
                             <div class="relative" x-data="{ open: false }">
                                 <button @click="open = !open" class="flex items-center text-[#706F6C] hover:text-[#F8B803]">
                                     {{ Auth::user()->name }}

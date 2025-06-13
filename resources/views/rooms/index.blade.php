@@ -36,6 +36,26 @@
         </script>
     @endif
     
+    @if(session('error'))
+        <div id="error-alert" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+            <div class="flex justify-between items-center">
+                <p>{{ session('error') }}</p>
+                <span class="text-red-700 hover:text-red-800 cursor-pointer" onclick="document.getElementById('error-alert').remove()">×</span>
+            </div>
+        </div>
+
+        <script>
+            // Auto-hide the error message after 5 seconds
+            setTimeout(function() {
+                const alert = document.getElementById('error-alert');
+                if (alert) {
+                    alert.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+                    setTimeout(() => alert.remove(), 500);
+                }
+            }, 3000);
+        </script>
+    @endif
+    
     <!-- Room management using Livewire component with real-time updates -->
     <livewire:room-status-list 
         :statusFilter="$statusFilter" 
