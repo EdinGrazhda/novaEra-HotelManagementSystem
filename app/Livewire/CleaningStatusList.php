@@ -61,7 +61,16 @@ class CleaningStatusList extends Component
         
         $room->save();
         
+        // Dispatch status update events
         $this->dispatch('statusUpdated', roomId: $roomId, status: $status);
+        $this->dispatch('cleaning-status-updated', roomId: $roomId);
+
+        // Direct refresh for dashboard - similar to rooms index page pattern
+        $this->dispatch('refresh-dashboard');
+        
+        // Log the change
+        logger()->info("Cleaning status updated for room {$roomId} to {$status}");
+        
         session()->flash('success', "Room {$room->room_number} cleaning status updated to " . ucfirst(str_replace('_', ' ', $status)));
     }
 

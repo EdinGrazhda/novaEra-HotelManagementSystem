@@ -86,9 +86,9 @@
                         </div>
                     </div>
                 </div>
+                </div>
             </div>
-        </div>
-        
+            
         <div class="p-6">
             <h2 class="text-xl font-semibold mb-4 text-[#1B1B18]">Room Status Overview</h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

@@ -272,7 +272,10 @@ class RoomController extends Controller
         $cleaningStatusText = str_replace('_', ' ', $newStatus);
         $statusMessage = 'Cleaning status changed to ' . ucfirst($cleaningStatusText) . ' successfully.';
         
-        return redirect()->back()->with('success', $statusMessage);
+        // Use JavaScript to trigger a browser event to refresh the dashboard
+        return redirect()->back()
+            ->with('success', $statusMessage)
+            ->with('triggerDashboardRefresh', true); // This will be used in the view to trigger a JavaScript event
     }
 
     /**

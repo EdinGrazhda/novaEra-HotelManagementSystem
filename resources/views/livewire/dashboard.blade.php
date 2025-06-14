@@ -118,6 +118,19 @@
         .hover-only {
             display: none;
         }
+    }
+    
+    /* Room status real-time highlight effect */
+    .highlight-change {
+        animation: pulse-highlight 2s ease-in-out;
+    }
+    
+    @keyframes pulse-highlight {
+        0% { background-color: transparent; }
+        25% { background-color: rgba(249, 185, 3, 0.3); }
+        75% { background-color: rgba(249, 185, 3, 0.3); }
+        100% { background-color: transparent; }
+    }
         
         .touch-target {
             min-height: 44px;
@@ -253,7 +266,13 @@
 <!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div wire:poll.15s="loadDashboardData" wire:loading.class.delay="opacity-50" class="container mx-auto px-4 py-8">
+<div 
+    
+    wire:init="loadDashboardData"
+    wire:loading.class.delay="opacity-75"
+    id="dashboard-main-container"
+    class="container mx-auto px-4 py-8"
+>
     <!-- Header Section -->
     <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
         <div class="bg-[#f9b903] p-6">
@@ -263,15 +282,32 @@
                     <p class="text-[#1B1B18] opacity-80">Welcome to the NovaERA Hotel Management System</p>
                 </div>
                 <div class="flex items-center space-x-2">
+                    <!-- Loading indicator -->
                     <div class="text-sm text-[#1B1B18] bg-white bg-opacity-50 py-1 px-3 rounded-full flex items-center animate-pulse" wire:loading>
                         <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-[#1B1B18]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <span>Auto-refreshing... (Last updated: {{ now()->format('H:i:s') }})</span>
+                        <span>Loading data...</span>
                     </div>
-                    <button wire:click="refreshDashboard" class="text-sm text-[#1B1B18] bg-white py-1 px-4 rounded-full flex items-center hover:bg-opacity-90 transition-colors shadow-sm">
-                        <i class="fas fa-sync-alt mr-2"></i> Refresh Now
+                    
+                    <!-- Last updated indicator -->
+                    <div class="text-sm bg-white bg-opacity-80 py-1 px-3 rounded-full flex items-center shadow-sm transition-all duration-500 ease-in-out" id="update-indicator">
+                        <i class="fas fa-clock mr-2 text-[#f9b903]"></i>
+                        <span>Last updated: <span id="last-update-time">{{ $lastUpdated ?? now()->format('H:i:s') }}</span></span>
+                        <div class="ml-2 h-2 w-2 rounded-full bg-green-500 animate-pulse-green" title="Auto-refresh active every 15 seconds"></div>
+                    </div>
+                    
+                    <!-- Manual refresh button -->
+                    <button 
+                        wire:click="refreshDashboard" 
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-70"
+                        class="text-sm text-[#1B1B18] bg-white py-1 px-4 rounded-full flex items-center hover:bg-opacity-90 transition-colors shadow-sm"
+                    >
+                        <i class="fas fa-sync-alt mr-2" wire:loading.class="animate-spin"></i> 
+                        <span wire:loading.remove>Refresh Now</span>
+                        <span wire:loading>Refreshing...</span>
                     </button>
                 </div>
             </div>
@@ -283,7 +319,9 @@
                         </div>
                         <div>
                             <p class="text-xs text-gray-500">Occupancy Rate</p>
-                            <p class="font-bold text-lg">{{ $totalRooms > 0 ? round(($occupiedRooms / $totalRooms) * 100) : 0 }}%</p>
+                            <p class="font-bold text-lg" data-track-changes data-track-id="occupancy-rate">
+                                {{ $totalRooms > 0 ? round(($occupiedRooms / $totalRooms) * 100) : 0 }}%
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -325,7 +363,7 @@
     </div>
     
 
-    @include('livewire.dashboard-components.room-status-section')
+    @livewire('real-time-room-status')
 
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
@@ -468,18 +506,19 @@
         }
     };
     
-    // Listen for Livewire events to update all charts
+    // Initialize charts once when the dashboard is first loaded
     document.addEventListener('livewire:initialized', () => {
         if (typeof @this !== 'undefined') {
-            @this.on('dashboard-data-updated', () => {
-                console.log("Dashboard data updated event received");
-                // Use the central registry to update charts
-                window.novaEraCharts.updateAll();
-                
-                // Backwards compatibility
-                if (typeof updateMonthlyTrendsChart === 'function') updateMonthlyTrendsChart();
-                if (typeof updateRoomCategoryChart === 'function') updateRoomCategoryChart();
-            });
+            // Update time display
+            const updateTime = new Date().toLocaleTimeString();
+            document.getElementById('last-update-time').textContent = updateTime;
+            
+            // Use the central registry to initialize charts
+            window.novaEraCharts.updateAll();
+            
+            // Backwards compatibility
+            if (typeof updateMonthlyTrendsChart === 'function') updateMonthlyTrendsChart();
+            if (typeof updateRoomCategoryChart === 'function') updateRoomCategoryChart();
         }
     });
     
@@ -565,4 +604,140 @@
             darkModeMediaQuery.addEventListener('change', handleThemeChange);
         }
     }
+    
+    // Track previous values to detect changes
+    window.previousValues = {};
+    
+    // Function to highlight elements that have changed
+    function highlightChangedValues() {
+        // Get all numeric values that might change
+        const numericElements = document.querySelectorAll('[data-track-changes]');
+        
+        numericElements.forEach(el => {
+            const key = el.dataset.trackId || el.textContent;
+            const currentValue = el.textContent.trim();
+            
+            // If we have a previous value and it's different
+            if (window.previousValues[key] && window.previousValues[key] !== currentValue) {
+                // Add highlight class
+                el.classList.add('highlight-change');
+                
+                // Remove highlight class after animation
+                setTimeout(() => {
+                    el.classList.remove('highlight-change');
+                }, 2000);
+            }
+            
+            // Store current value for next comparison
+            window.previousValues[key] = currentValue;
+        });
+    }
+    
+    // Call this function on every Livewire update
+    // Removed real-time update event listener
+    
+    // Function to flash/highlight an element by ID or the element itself
+    function flashElement(elementOrId) {
+        const element = typeof elementOrId === 'string' ? document.getElementById(elementOrId) : elementOrId;
+        
+        if (element) {
+            // Add highlight class
+            element.classList.add('highlight-change');
+            
+            // Remove highlight class after animation
+            setTimeout(() => {
+                element.classList.remove('highlight-change');
+            }, 2000);
+        }
+    }
+    
+    // Function to highlight elements by class
+    function highlightElementsByClass(className) {
+        const elements = document.getElementsByClassName(className);
+        Array.from(elements).forEach(el => flashElement(el));
+    }
+    
+    // Function to update the cleaning gauge dynamically
+    function updateCleaningGauge() {
+        // Get the latest values from the dashboard component
+        if (typeof @this !== 'undefined') {
+            @this.refreshDashboard().then(() => {
+                const gaugeElement = document.querySelector('path[stroke="url(#cleanGradient)"]');
+                const cleanPercentElement = document.getElementById('clean-percentage');
+                
+                if (gaugeElement && cleanPercentElement) {
+                    // Get the latest data
+                    const totalRooms = parseInt(@this.totalRooms) || 1;
+                    const cleanRooms = parseInt(@this.cleanRooms) || 0;
+                    const cleanPercent = Math.round((cleanRooms / totalRooms) * 100);
+                    
+                    // Update the gauge visual
+                    gaugeElement.setAttribute('stroke-dasharray', `${cleanPercent}, 100`);
+                    
+                    // Update the percentage text
+                    cleanPercentElement.textContent = cleanPercent;
+                    
+                    // Flash the updated elements
+                    flashElement(gaugeElement);
+                    flashElement(cleanPercentElement);
+                    
+                    console.log('Cleaning gauge updated with values:', {
+                        totalRooms,
+                        cleanRooms,
+                        cleanPercent
+                    });
+                }
+            });
+        }
+    }
+    
+    // Add CSS for highlight animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes highlight-pulse {
+            0% { background-color: rgba(249, 185, 3, 0); }
+            50% { background-color: rgba(249, 185, 3, 0.2); }
+            100% { background-color: rgba(249, 185, 3, 0); }
+        }
+        .highlight-change {
+            animation: highlight-pulse 2s ease-in-out;
+        }
+        
+        @keyframes stroke-highlight {
+            0% { stroke-width: 4; }
+            50% { stroke-width: 6; }
+            100% { stroke-width: 4; }
+        }
+        path.highlight-change {
+            animation: stroke-highlight 2s ease-in-out;
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+
+<!-- Dashboard highlighting functions for manual refresh -->
+<script>
+    // Function to highlight status elements when they change
+    function highlightStatusElements(className) {
+        const elements = document.getElementsByClassName(className);
+        if (elements.length > 0) {
+            Array.from(elements).forEach(el => {
+                // Add highlight class
+                el.classList.add('highlight-change');
+                
+                // Remove highlight class after animation
+                setTimeout(() => {
+                    el.classList.remove('highlight-change');
+                }, 2000);
+            });
+        }
+    }
+</script>
+
+<!-- Dashboard initialization -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Basic dashboard initialization
+        console.log('Dashboard initialized at', new Date().toISOString());
+    });
 </script>

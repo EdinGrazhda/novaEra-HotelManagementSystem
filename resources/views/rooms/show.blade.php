@@ -321,4 +321,28 @@
 
 <!-- Include script to maintain room colors when changing cleaning status -->
 <script src="{{ asset('js/room-cleaning-updates.js') }}"></script>
+
+@if(session('triggerDashboardRefresh'))
+<script>
+    // This script will send an event to refresh the dashboard when triggered from a controller
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Dispatching dashboard refresh event from room show page");
+        // Create and dispatch a custom event for the dashboard to listen to
+        const event = new CustomEvent('refresh-dashboard', { 
+            bubbles: true,
+            detail: { source: 'room-show', timestamp: new Date().getTime() }
+        });
+        document.dispatchEvent(event);
+        
+        // If there's another dashboard window open, try to refresh that too
+        try {
+            if (window.opener && !window.opener.closed) {
+                window.opener.dispatchEvent(event);
+            }
+        } catch (e) {
+            console.log("Could not refresh parent window", e);
+        }
+    });
+</script>
+@endif
 </x-layouts.app>
