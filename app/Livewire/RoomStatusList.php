@@ -75,7 +75,17 @@ class RoomStatusList extends Component
         $room->room_status = 'occupied';
         $room->save();
         
-        $this->dispatch('statusUpdated', roomId: $roomId, action: 'checkin');
+        // Dispatch events for real-time updates
+        $this->dispatch('statusUpdated', roomId: $roomId, action: 'checkin', status: 'occupied');
+        
+        // IMPORTANT: Direct dashboard refresh
+        $this->dispatch('refresh-dashboard');
+        
+        // Clear cache
+        DB::statement('SET SESSION query_cache_type = OFF');
+        
+        logger()->info("Room {$room->room_number} checked in - Dashboard refresh triggered");
+        
         session()->flash('success', "Room {$room->room_number} checked in successfully.");
     }
     
@@ -89,6 +99,12 @@ class RoomStatusList extends Component
         $room->save();
         
         $this->dispatch('statusUpdated', roomId: $roomId, action: 'checkout');
+        
+        // IMPORTANT: Direct dashboard refresh
+        $this->dispatch('refresh-dashboard');
+        
+        logger()->info("Room {$room->room_number} checked out, changing cleaning status to not_cleaned - Dashboard refresh triggered");
+        
         session()->flash('success', "Room {$room->room_number} checked out successfully.");
     }
 

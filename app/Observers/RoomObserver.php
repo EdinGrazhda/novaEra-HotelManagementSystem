@@ -56,6 +56,23 @@ class RoomObserver
      */
     public function updated(Room $room)
     {
-        // This method can be used for additional logic when a room is updated
+        // Dispatch Laravel events when room status or cleaning status changes
+        $eventsDispatched = [];
+        
+        if ($room->isDirty('room_status') || $room->wasChanged('room_status')) {
+            // Use Laravel's event system instead of Livewire directly
+            event('room-status-updated', ['roomId' => $room->id]);
+            $eventsDispatched[] = 'room-status-updated';
+        }
+        
+        if ($room->isDirty('cleaning_status') || $room->wasChanged('cleaning_status')) {
+            event('cleaning-status-updated', ['roomId' => $room->id]);
+            $eventsDispatched[] = 'cleaning-status-updated';
+        }
+        
+        // Log the events for debugging
+        if (!empty($eventsDispatched)) {
+            \Illuminate\Support\Facades\Log::info('Room observer dispatched events: ' . implode(', ', $eventsDispatched) . ' for room ' . $room->id);
+        }
     }
 }

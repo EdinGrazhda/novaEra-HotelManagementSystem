@@ -40,7 +40,7 @@
                     <circle cx="18" cy="18" r="12" fill="white" />
                     
                     <!-- Number display -->
-                    <text x="18" y="17.5" text-anchor="middle" fill="#333" font-size="7.5" font-weight="700">
+                    <text x="18" y="17.5" text-anchor="middle" fill="#333" font-size="7.5" font-weight="700" id="clean-percentage" data-track-changes data-track-id="clean-percentage">
                         {{ $totalRooms > 0 ? round(($cleanRooms / $totalRooms) * 100) : 0 }}
                     </text>
                     <!-- Percentage symbol -->
@@ -73,13 +73,13 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-500">Clean</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ $cleanRooms ?? 0 }}</p>
+                        <p class="text-2xl font-bold text-gray-800" data-track-changes data-track-id="clean-rooms">{{ $cleanRooms ?? 0 }}</p>
                     </div>
                     <div class="rounded-full bg-green-100 p-2 text-green-500">
                         <i class="fas fa-check-circle text-lg"></i>
                     </div>
                 </div>
-                <div class="mt-4 text-xs text-green-600">
+                <div class="mt-4 text-xs text-green-600" data-track-changes data-track-id="clean-percent">
                     {{ $totalRooms > 0 ? round(($cleanRooms / $totalRooms) * 100) : 0 }}% of total rooms
                 </div>
             </div>
@@ -90,13 +90,13 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-500">In Progress</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ $inProgressCleaningRooms ?? 0 }}</p>
+                        <p class="text-2xl font-bold text-gray-800" data-track-changes data-track-id="in-progress-rooms">{{ $inProgressCleaningRooms ?? 0 }}</p>
                     </div>
                     <div class="rounded-full bg-amber-100 p-2 text-amber-500">
                         <i class="fas fa-broom text-lg"></i>
                     </div>
                 </div>
-                <div class="mt-4 text-xs text-amber-600">
+                <div class="mt-4 text-xs text-amber-600" data-track-changes data-track-id="in-progress-percent">
                     {{ $totalRooms > 0 ? round(($inProgressCleaningRooms / $totalRooms) * 100) : 0 }}% of total rooms
                 </div>
             </div>
@@ -107,13 +107,13 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-500">Needs Cleaning</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ $notCleanedRooms ?? 0 }}</p>
+                        <p class="text-2xl font-bold text-gray-800" data-track-changes data-track-id="not-cleaned-rooms">{{ $notCleanedRooms ?? 0 }}</p>
                     </div>
                     <div class="rounded-full bg-red-100 p-2 text-red-500">
                         <i class="fas fa-exclamation-triangle text-lg"></i>
                     </div>
                 </div>
-                <div class="mt-4 text-xs text-red-600">
+                <div class="mt-4 text-xs text-red-600" data-track-changes data-track-id="not-cleaned-percent">
                     {{ $totalRooms > 0 ? round(($notCleanedRooms / $totalRooms) * 100) : 0 }}% of total rooms
                 </div>
             </div>

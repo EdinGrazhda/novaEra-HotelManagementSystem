@@ -86,6 +86,32 @@
                 // Update the URL without refreshing the page
                 window.history.pushState({}, '', url);
             });
+            
+            // Listen for status updates and notify any open dashboard
+            Livewire.on('statusUpdated', (data) => {
+                console.log('Status updated event received:', data);
+                
+                // Try to notify dashboard if it's open in another window/tab
+                try {
+                    // Broadcast to all windows
+                    if (typeof BroadcastChannel !== 'undefined') {
+                        const bc = new BroadcastChannel('nova-era-dashboard');
+                        bc.postMessage({
+                            type: 'refresh-dashboard',
+                            data: data
+                        });
+                    }
+                    
+                    // Also create a custom event for any dashboard in the current page
+                    const event = new CustomEvent('refresh-dashboard', {
+                        detail: data,
+                        bubbles: true
+                    });
+                    document.dispatchEvent(event);
+                } catch (e) {
+                    console.error('Failed to notify dashboard:', e);
+                }
+            });
         });
     </script>
 </div>

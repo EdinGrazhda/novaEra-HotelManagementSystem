@@ -205,6 +205,12 @@ class RoomCalendar extends Component
         $this->clearCalendarCache();
         
         $this->dispatch('statusUpdated', roomId: $roomId, action: 'checkin');
+        
+        // IMPORTANT: Direct dashboard refresh
+        $this->dispatch('refresh-dashboard');
+        
+        logger()->info("Room Calendar: Room {$room->room_number} checked in - Dashboard refresh triggered");
+        
         session()->flash('success', "Room {$room->room_number} checked in successfully.");
     }
     
@@ -221,6 +227,12 @@ class RoomCalendar extends Component
         $this->clearCalendarCache();
         
         $this->dispatch('statusUpdated', roomId: $roomId, action: 'checkout');
+        
+        // IMPORTANT: Direct dashboard refresh
+        $this->dispatch('refresh-dashboard');
+        
+        logger()->info("Room Calendar: Room {$room->room_number} checked out - Dashboard refresh triggered");
+        
         session()->flash('success', "Room {$room->room_number} checked out successfully.");
     }
     
