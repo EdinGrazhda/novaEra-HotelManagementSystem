@@ -45,6 +45,18 @@ class AppServiceProvider extends ServiceProvider
                     $events[] = 'room-status-updated';
                 }
                 
+                // Check for check-in/check-out related changes
+                if ($room->wasChanged('checkin_status') || $room->wasChanged('checkin_time') ||
+                    $room->wasChanged('checkout_status') || $room->wasChanged('checkout_time')) {
+                    event('checkin-checkout-updated', [
+                        'roomId' => $room->id,
+                        'action' => $room->wasChanged('checkin_status') || $room->wasChanged('checkin_time') ? 'checkin' : 'checkout',
+                        'status' => $room->wasChanged('checkin_status') ? $room->checkin_status : 
+                                   ($room->wasChanged('checkout_status') ? $room->checkout_status : null)
+                    ]);
+                    $events[] = 'checkin-checkout-updated';
+                }
+                
                 if (!empty($events)) {
                     \Illuminate\Support\Facades\Log::info('Global events dispatched: ' . implode(', ', $events) . ' for room ' . $room->id);
                 }

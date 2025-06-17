@@ -198,6 +198,17 @@
     .status-bg-alert { background-color: var(--status-danger); }
     
     /* Status light background colors */
+    
+    /* Check-in/Check-out specific animations */
+    @keyframes pulse-number {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.15); color: var(--brand-gold); }
+        100% { transform: scale(1); }
+    }
+    
+    .pulse-number {
+        animation: pulse-number 1s ease-in-out;
+    }
     .status-bg-available-light { background-color: rgba(16, 185, 129, 0.1); }
     .status-bg-occupied-light { background-color: rgba(59, 130, 246, 0.1); }
     .status-bg-maintenance-light { background-color: rgba(245, 158, 11, 0.1); }
@@ -343,7 +354,7 @@
                         </div>
                         <div>
                             <p class="text-xs text-gray-500">Today's Activity</p>
-                            <p class="font-bold text-lg">{{ $checkedInToday + $checkedOutToday }}</p>
+                            <p class="font-bold text-lg">{{ $todayActivity ?? 0 }}</p>
                         </div>
                     </div>
                 </div>
@@ -368,9 +379,9 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
 
-        @include('livewire.dashboard-components.cleaning-status-section-new')
+        @livewire('cleaning-status-section')
         
-        @include('livewire.dashboard-components.checkin-checkout-section')
+        <livewire:real-time-checkin-checkout />
     </div>
 
 

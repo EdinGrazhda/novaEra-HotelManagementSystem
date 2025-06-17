@@ -24,10 +24,9 @@ class Dashboard extends Component
     public $notCleanedRooms;
     public $inProgressCleaningRooms;
     
-    // Check-in/Check-out statistics
-    public $checkedInToday;
-    public $checkedOutToday;
-    public $pendingCheckouts;
+    // Check-in/Check-out statistics are now handled by RealTimeCheckinCheckout component
+    // But we still need this for the dashboard summary
+    public $todayActivity;
     
     // Menu order statistics
     public $totalFoodOrders;
@@ -62,6 +61,43 @@ class Dashboard extends Component
         $this->loadDashboardData();
     }
     
+    /**
+     * Method that will be called by wire:poll on the cleaning status component
+     * to update cleaning status data every 10 seconds
+     */
+    public function poll()
+    {
+        try {
+            logger()->debug('Cleaning status poll triggered at ' . now()->format('H:i:s'));
+            
+            // Only update cleaning status data to minimize DB queries
+            $this->totalRooms = Room::count();
+            $this->cleanRooms = Room::where('cleaning_status', 'clean')->count();
+            $this->notCleanedRooms = Room::where('cleaning_status', 'not_cleaned')->count();
+            $this->inProgressCleaningRooms = Room::where('cleaning_status', 'in_progress')->count();
+            
+            // Update todayActivity for the dashboard summary
+            $checkinCheckoutStats = \App\Services\DashboardService::getCheckinCheckoutStats();
+            $this->todayActivity = $checkinCheckoutStats['todayActivity'];
+            
+            // Update the last updated timestamp
+            $this->lastUpdated = now()->format('H:i:s');
+            
+            // We don't need to dispatch an event here because Livewire will automatically
+            // refresh the component when poll() is called
+            
+            return [
+                'cleanRooms' => $this->cleanRooms,
+                'notCleanedRooms' => $this->notCleanedRooms,
+                'inProgressCleaningRooms' => $this->inProgressCleaningRooms,
+                'todayActivity' => $this->todayActivity
+            ];
+        } catch (\Exception $e) {
+            logger()->error("Error polling cleaning status: {$e->getMessage()}");
+            return null;
+        }
+    }
+    
     public function loadDashboardData()
     {
         try {
@@ -91,12 +127,10 @@ class Dashboard extends Component
             $this->notCleanedRooms = Room::where('cleaning_status', 'not_cleaned')->count();
             $this->inProgressCleaningRooms = Room::where('cleaning_status', 'in_progress')->count();
             
-            // Check-in/Check-out statistics
-            $this->checkedInToday = Room::whereDate('checkin_time', now()->toDateString())->count();
-            $this->checkedOutToday = Room::whereDate('checkout_time', now()->toDateString())->count();
-            $this->pendingCheckouts = Room::where('checkin_status', 'checked_in')
-                ->where('checkout_status', '!=', 'checked_out')
-                ->count();
+            // Check-in/Check-out statistics are now handled by RealTimeCheckinCheckout component
+            // But we still need todayActivity for the dashboard summary
+            $checkinCheckoutStats = \App\Services\DashboardService::getCheckinCheckoutStats();
+            $this->todayActivity = $checkinCheckoutStats['todayActivity'];
             
             // Menu order statistics
             $this->totalFoodOrders = RoomMenuOrder::count();
@@ -244,6 +278,12 @@ class Dashboard extends Component
         
         if (empty($this->roomsByCategory)) {
             $this->roomsByCategory = $this->getRoomCategoryDistribution();
+        }
+        
+        // Ensure todayActivity is always available
+        if (!isset($this->todayActivity)) {
+            $checkinCheckoutStats = \App\Services\DashboardService::getCheckinCheckoutStats();
+            $this->todayActivity = $checkinCheckoutStats['todayActivity'];
         }
         
         // Don't dispatch event in render as it can cause infinite loops with Livewire navigation

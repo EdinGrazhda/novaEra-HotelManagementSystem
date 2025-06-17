@@ -61,7 +61,7 @@ class RoomController extends Controller
             ];
         }
         
-        // Room category distribution
+      
         $roomsByCategory = Room::with('roomCategory')
             ->get()
             ->groupBy('roomCategory.category_name')
