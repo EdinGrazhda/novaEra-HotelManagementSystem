@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Room;
+use App\Models\RoomMenuOrder;
 use App\Observers\RoomObserver;
+use App\Observers\RoomMenuOrderObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,6 +25,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register the Room observer to handle automatic cleaning status changes
         Room::observe(RoomObserver::class);
+        
+        // Register the RoomMenuOrder observer for real-time food order updates
+        RoomMenuOrder::observe(RoomMenuOrderObserver::class);
         
         // Global event listener for room updates affecting cleaning status
         // This ensures that any updates to rooms from anywhere in the app will

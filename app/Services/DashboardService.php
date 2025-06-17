@@ -47,8 +47,7 @@ class DashboardService
             'maintenanceRooms' => $maintenanceRooms
         ];
     }
-    
-    /**
+      /**
      * Get cleaning status statistics for the dashboard
      *
      * @return array
@@ -65,6 +64,28 @@ class DashboardService
             'cleanRooms' => $cleanRooms,
             'notCleanedRooms' => $notCleanedRooms,
             'inProgressCleaningRooms' => $inProgressCleaningRooms
+        ];
+    }
+    
+    /**
+     * Get food order status statistics for the dashboard
+     *
+     * @return array
+     */
+    public static function getFoodOrderStats()
+    {
+        $totalFoodOrders = RoomMenuOrder::count();
+        $receivedOrders = RoomMenuOrder::where('status', 'received')->count();
+        $preparingOrders = RoomMenuOrder::where('status', 'in_process')->count();
+        $deliveredOrders = RoomMenuOrder::where('status', 'delivered')->count();
+        $fulfillmentRate = $totalFoodOrders > 0 ? round(($deliveredOrders / $totalFoodOrders) * 100) : 0;
+        
+        return [
+            'totalFoodOrders' => $totalFoodOrders,
+            'receivedOrders' => $receivedOrders,
+            'preparingOrders' => $preparingOrders, 
+            'deliveredOrders' => $deliveredOrders,
+            'fulfillmentRate' => $fulfillmentRate
         ];
     }
 }

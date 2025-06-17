@@ -28,11 +28,7 @@ class Dashboard extends Component
     // But we still need this for the dashboard summary
     public $todayActivity;
     
-    // Menu order statistics
-    public $totalFoodOrders;
-    public $receivedOrders;
-    public $preparingOrders;
-    public $deliveredOrders;
+    // Menu order statistics are now handled by RealTimeFoodStatus component
     
     // Chart data
     public $monthlyData;
@@ -132,11 +128,7 @@ class Dashboard extends Component
             $checkinCheckoutStats = \App\Services\DashboardService::getCheckinCheckoutStats();
             $this->todayActivity = $checkinCheckoutStats['todayActivity'];
             
-            // Menu order statistics
-            $this->totalFoodOrders = RoomMenuOrder::count();
-            $this->receivedOrders = RoomMenuOrder::where('status', 'received')->count();
-            $this->preparingOrders = RoomMenuOrder::where('status', 'in_process')->count();
-            $this->deliveredOrders = RoomMenuOrder::where('status', 'delivered')->count();
+            // Menu order statistics are now handled by RealTimeFoodStatus component
             
             // Monthly statistics for check-ins and check-outs (for charts)
             $this->monthlyData = $this->getMonthlyData();
@@ -254,22 +246,7 @@ class Dashboard extends Component
             $this->cleanRooms = Room::where('cleaning_status', 'clean')->count();
         }
         
-        // Ensure food service statistics are available
-        if (empty($this->totalFoodOrders)) {
-            $this->totalFoodOrders = RoomMenuOrder::count();
-        }
-        
-        if (!isset($this->receivedOrders)) {
-            $this->receivedOrders = RoomMenuOrder::where('status', 'received')->count();
-        }
-        
-        if (!isset($this->preparingOrders)) {
-            $this->preparingOrders = RoomMenuOrder::where('status', 'in_process')->count();
-        }
-        
-        if (empty($this->deliveredOrders)) {
-            $this->deliveredOrders = RoomMenuOrder::where('status', 'delivered')->count();
-        }
+        // Food service statistics are now handled by RealTimeFoodStatus component
         
         // Always ensure chart data is available
         if (empty($this->monthlyData)) {

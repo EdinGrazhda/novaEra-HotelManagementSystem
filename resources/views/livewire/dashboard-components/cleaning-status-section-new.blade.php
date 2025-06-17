@@ -1,5 +1,5 @@
 <!-- Cleaning Status Section -->
-<div wire:poll.10s="poll" class="bg-white rounded-lg shadow-lg overflow-hidden">
+<div wire:poll.15s="poll" class="bg-white rounded-lg shadow-lg overflow-hidden">
     <div class="p-4 bg-[#f9b903] text-[#1B1B18] flex items-center justify-between">
         <h2 class="text-xl font-semibold">Housekeeping Status</h2>
         <div class="flex items-center">
