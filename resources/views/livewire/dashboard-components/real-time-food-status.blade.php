@@ -1,7 +1,7 @@
 <div>
     <!-- Real-time Food Status Section -->
     <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8" 
-        wire:poll.15s="poll"
+        wire:poll.12s="poll"
         x-data="{
             lastUpdate: '',
             isUpdating: false,
