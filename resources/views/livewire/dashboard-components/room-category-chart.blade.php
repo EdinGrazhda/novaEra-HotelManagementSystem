@@ -25,6 +25,12 @@
         const ctx = document.getElementById('roomCategoryChart');
         if (!ctx) return null;
         
+        // Sample data to show immediately
+        const sampleData = {
+            labels: ['Standard', 'Deluxe', 'Suite', 'Presidential'],
+            values: [12, 8, 5, 2]
+        };
+        
         // Define brand-matching colors with CSS variables where possible
         const backgroundColors = [
             'rgba(249, 185, 3, 0.9)',     // Main brand color
@@ -43,9 +49,9 @@
         const config = {
             type: 'doughnut',
             data: {
-                labels: [],
+                labels: sampleData.labels,
                 datasets: [{
-                    data: [],
+                    data: sampleData.values,
                     backgroundColor: backgroundColors,
                     borderColor: backgroundColors.map(color => color.replace(/[0-9]\.([0-9])/, '1')),
                     borderWidth: 1,
@@ -116,25 +122,78 @@
     }
     
     function updateRoomCategoryChart() {
+        console.log('Updating room category chart data');
+        
         // Get the chart instance from registry or local variable
         const chart = window.novaEraCharts ? 
             window.novaEraCharts.getChart('RoomCategory') : 
             roomCategoryChart;
         
-        // If chart doesn't exist, stop
-        if (!chart) return;
+        // If chart doesn't exist, initialize it first
+        if (!chart) {
+            console.log('Room category chart not found, initializing first');
+            roomCategoryChart = initRoomCategoryChart();
+            if (!roomCategoryChart) return; // Exit if initialization failed
+        }
         
-        @this.getChartRoomCategories().then(categoryData => {
-            if (!categoryData || !categoryData.length) return;
+        // Reference to the chart we'll update
+        const chartToUpdate = chart || roomCategoryChart;
+        
+        // Make sure Livewire is initialized
+        if (typeof @this === 'undefined') {
+            console.error('Livewire component not initialized yet');
+            return;
+        }
+        
+        // Show loading state
+        const container = document.querySelector('#roomCategoryChart').closest('.chart-container');
+        if (container) {
+            const loadingDiv = container.querySelector('.chart-loading');
+            if (loadingDiv) {
+                loadingDiv.style.display = 'flex';
+            }
+        }
+        
+        // Try to get data with exponential backoff
+        let attempts = 0;
+        const maxAttempts = 5;
+        
+        function attemptDataLoad() {
+            attempts++;
+            console.log(`Attempt ${attempts} to load room category chart data`);
             
-            const labels = categoryData.map(item => item.category);
-            const values = categoryData.map(item => item.count);
-            
-            chart.data.labels = labels;
-            chart.data.datasets[0].data = values;
-            
-            chart.update('normal');
-        });
+            @this.getChartRoomCategories().then(categoryData => {
+                // Hide loading indicator
+                if (container && container.querySelector('.chart-loading')) {
+                    container.querySelector('.chart-loading').style.display = 'none';
+                }
+                
+                if (categoryData && categoryData.length) {
+                    console.log('Room category data loaded successfully:', categoryData.length, 'items');
+                    
+                    const labels = categoryData.map(item => item.category);
+                    const values = categoryData.map(item => item.count);
+                    
+                    chartToUpdate.data.labels = labels;
+                    chartToUpdate.data.datasets[0].data = values;
+                    
+                    chartToUpdate.update('normal');
+                } else if (attempts < maxAttempts) {
+                    console.log(`No category data received, retrying in ${500 * attempts}ms...`);
+                    setTimeout(attemptDataLoad, 500 * attempts); // Exponential backoff
+                } else {
+                    console.error('Failed to load room category data after', maxAttempts, 'attempts');
+                }
+            }).catch(err => {
+                console.error('Error loading room category data:', err);
+                if (attempts < maxAttempts) {
+                    setTimeout(attemptDataLoad, 500 * attempts);
+                }
+            });
+        }
+        
+        // Start the first attempt
+        attemptDataLoad();
     }
     
     // Initialize the chart when Livewire is ready
@@ -146,5 +205,48 @@
                 updateRoomCategoryChart();
             }
         }, 100);
+    });
+    
+    // Re-initialize chart when navigating back to dashboard
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            // Check if canvas exists and has no chart attached
+            const ctx = document.getElementById('roomCategoryChart');
+            if (ctx && !ctx.chart && typeof Chart !== 'undefined') {
+                console.log('Reinitializing room category chart after page visibility change');
+                setTimeout(() => {
+                    // If chart instance exists but is stale, destroy it
+                    if (roomCategoryChart && roomCategoryChart.destroyed) {
+                        roomCategoryChart = null;
+                    }
+                    
+                    // Reinitialize if needed
+                    roomCategoryChart = roomCategoryChart || initRoomCategoryChart();
+                    if (roomCategoryChart) {
+                        updateRoomCategoryChart();
+                    }
+                }, 300);
+            }
+        }
+    });
+    
+    // Also listen for Alpine JS hook when navigation occurs
+    document.addEventListener('alpine:navigated', () => {
+        console.log('Navigation detected, ensuring room category chart is initialized');
+        setTimeout(() => {
+            const ctx = document.getElementById('roomCategoryChart');
+            if (ctx && typeof Chart !== 'undefined') {
+                // If chart instance exists but is stale, destroy it
+                if (roomCategoryChart && (roomCategoryChart.destroyed || !ctx.chart)) {
+                    roomCategoryChart = null;
+                }
+                
+                // Reinitialize if needed
+                roomCategoryChart = roomCategoryChart || initRoomCategoryChart();
+                if (roomCategoryChart) {
+                    updateRoomCategoryChart();
+                }
+            }
+        }, 300);
     });
 </script>

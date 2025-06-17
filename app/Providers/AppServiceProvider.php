@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Room;
+use App\Models\RoomMenuOrder;
 use App\Observers\RoomObserver;
+use App\Observers\RoomMenuOrderObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -24,6 +26,9 @@ class AppServiceProvider extends ServiceProvider
         // Register the Room observer to handle automatic cleaning status changes
         Room::observe(RoomObserver::class);
         
+        // Register the RoomMenuOrder observer for real-time food order updates
+        RoomMenuOrder::observe(RoomMenuOrderObserver::class);
+        
         // Global event listener for room updates affecting cleaning status
         // This ensures that any updates to rooms from anywhere in the app will
         // properly trigger the dashboard to update
@@ -43,6 +48,18 @@ class AppServiceProvider extends ServiceProvider
                 if ($room->wasChanged('room_status')) {
                     event('room-status-updated', ['roomId' => $room->id]);
                     $events[] = 'room-status-updated';
+                }
+                
+                // Check for check-in/check-out related changes
+                if ($room->wasChanged('checkin_status') || $room->wasChanged('checkin_time') ||
+                    $room->wasChanged('checkout_status') || $room->wasChanged('checkout_time')) {
+                    event('checkin-checkout-updated', [
+                        'roomId' => $room->id,
+                        'action' => $room->wasChanged('checkin_status') || $room->wasChanged('checkin_time') ? 'checkin' : 'checkout',
+                        'status' => $room->wasChanged('checkin_status') ? $room->checkin_status : 
+                                   ($room->wasChanged('checkout_status') ? $room->checkout_status : null)
+                    ]);
+                    $events[] = 'checkin-checkout-updated';
                 }
                 
                 if (!empty($events)) {

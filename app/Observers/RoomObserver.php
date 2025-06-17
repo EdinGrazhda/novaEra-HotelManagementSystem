@@ -56,7 +56,7 @@ class RoomObserver
      */
     public function updated(Room $room)
     {
-        // Dispatch Laravel events when room status or cleaning status changes
+        // Dispatch Laravel events when room status, cleaning status, or checkin/checkout status changes
         $eventsDispatched = [];
         
         if ($room->isDirty('room_status') || $room->wasChanged('room_status')) {
@@ -68,6 +68,28 @@ class RoomObserver
         if ($room->isDirty('cleaning_status') || $room->wasChanged('cleaning_status')) {
             event('cleaning-status-updated', ['roomId' => $room->id]);
             $eventsDispatched[] = 'cleaning-status-updated';
+        }
+        
+        // Track check-in status changes
+        if ($room->isDirty('checkin_status') || $room->wasChanged('checkin_status') || 
+            $room->isDirty('checkin_time') || $room->wasChanged('checkin_time')) {
+            event('checkin-checkout-updated', [
+                'roomId' => $room->id, 
+                'action' => 'checkin', 
+                'status' => $room->checkin_status
+            ]);
+            $eventsDispatched[] = 'checkin-checkout-updated (checkin)';
+        }
+        
+        // Track check-out status changes
+        if ($room->isDirty('checkout_status') || $room->wasChanged('checkout_status') || 
+            $room->isDirty('checkout_time') || $room->wasChanged('checkout_time')) {
+            event('checkin-checkout-updated', [
+                'roomId' => $room->id, 
+                'action' => 'checkout', 
+                'status' => $room->checkout_status
+            ]);
+            $eventsDispatched[] = 'checkin-checkout-updated (checkout)';
         }
         
         // Log the events for debugging

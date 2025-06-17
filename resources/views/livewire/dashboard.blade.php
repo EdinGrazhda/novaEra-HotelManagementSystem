@@ -198,6 +198,17 @@
     .status-bg-alert { background-color: var(--status-danger); }
     
     /* Status light background colors */
+    
+    /* Check-in/Check-out specific animations */
+    @keyframes pulse-number {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.15); color: var(--brand-gold); }
+        100% { transform: scale(1); }
+    }
+    
+    .pulse-number {
+        animation: pulse-number 1s ease-in-out;
+    }
     .status-bg-available-light { background-color: rgba(16, 185, 129, 0.1); }
     .status-bg-occupied-light { background-color: rgba(59, 130, 246, 0.1); }
     .status-bg-maintenance-light { background-color: rgba(245, 158, 11, 0.1); }
@@ -343,7 +354,7 @@
                         </div>
                         <div>
                             <p class="text-xs text-gray-500">Today's Activity</p>
-                            <p class="font-bold text-lg">{{ $checkedInToday + $checkedOutToday }}</p>
+                            <p class="font-bold text-lg">{{ $todayActivity ?? 0 }}</p>
                         </div>
                     </div>
                 </div>
@@ -354,7 +365,7 @@
                         </div>
                         <div>
                             <p class="text-xs text-gray-500">Food Orders</p>
-                            <p class="font-bold text-lg">{{ $totalFoodOrders }}</p>
+                            <p class="font-bold text-lg" id="dashboard-food-orders-count">0</p>
                         </div>
                     </div>
                 </div>
@@ -368,13 +379,13 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
 
-        @include('livewire.dashboard-components.cleaning-status-section-new')
+        @livewire('cleaning-status-section')
         
-        @include('livewire.dashboard-components.checkin-checkout-section')
+        <livewire:real-time-checkin-checkout />
     </div>
 
 
-    @include('livewire.dashboard-components.food-status-section')
+    <livewire:real-time-food-status />
 
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
@@ -506,19 +517,49 @@
         }
     };
     
+    // Function to ensure charts initialization on page load or refresh
+    window.ensureChartsRendered = function() {
+        console.log('Ensuring charts are rendered with data');
+        
+        // First try - immediate update
+        if (typeof updateMonthlyTrendsChart === 'function') updateMonthlyTrendsChart();
+        if (typeof updateRoomCategoryChart === 'function') updateRoomCategoryChart();
+        
+        // Second try - after short delay (for Livewire data to be ready)
+        setTimeout(() => {
+            if (typeof updateMonthlyTrendsChart === 'function') updateMonthlyTrendsChart();
+            if (typeof updateRoomCategoryChart === 'function') updateRoomCategoryChart();
+        }, 500);
+        
+        // Third try - longer delay (fallback)
+        setTimeout(() => {
+            if (typeof updateMonthlyTrendsChart === 'function') updateMonthlyTrendsChart();
+            if (typeof updateRoomCategoryChart === 'function') updateRoomCategoryChart();
+        }, 2000);
+    };
+
     // Initialize charts once when the dashboard is first loaded
     document.addEventListener('livewire:initialized', () => {
         if (typeof @this !== 'undefined') {
             // Update time display
             const updateTime = new Date().toLocaleTimeString();
-            document.getElementById('last-update-time').textContent = updateTime;
+            if (document.getElementById('last-update-time')) {
+                document.getElementById('last-update-time').textContent = updateTime;
+            }
             
             // Use the central registry to initialize charts
-            window.novaEraCharts.updateAll();
+            if (window.novaEraCharts && window.novaEraCharts.updateAll) {
+                window.novaEraCharts.updateAll();
+            }
             
-            // Backwards compatibility
-            if (typeof updateMonthlyTrendsChart === 'function') updateMonthlyTrendsChart();
-            if (typeof updateRoomCategoryChart === 'function') updateRoomCategoryChart();
+            // Use our enhanced chart rendering function
+            if (typeof window.ensureChartsRendered === 'function') {
+                window.ensureChartsRendered();
+            } else {
+                // Backwards compatibility fallback
+                if (typeof updateMonthlyTrendsChart === 'function') updateMonthlyTrendsChart();
+                if (typeof updateRoomCategoryChart === 'function') updateRoomCategoryChart();
+            }
         }
     });
     
@@ -604,6 +645,62 @@
             darkModeMediaQuery.addEventListener('change', handleThemeChange);
         }
     }
+
+    // Global function to ensure all charts are initialized
+    // This will be useful when navigating back to the dashboard
+    window.reinitializeDashboardCharts = function() {
+        console.log('Manually reinitializing all dashboard charts');
+        
+        // Wait for DOM to be ready
+        setTimeout(() => {
+            // Initialize Monthly Trends Chart
+            if (typeof initMonthlyTrendsChart === 'function' && 
+                typeof updateMonthlyTrendsChart === 'function' && 
+                document.getElementById('monthlyTrendsChart')) {
+                
+                console.log('Reinitializing monthly trends chart');
+                window.monthlyTrendsChart = window.monthlyTrendsChart || initMonthlyTrendsChart();
+                if (window.monthlyTrendsChart) {
+                    updateMonthlyTrendsChart();
+                }
+            }
+            
+            // Initialize Room Category Chart
+            if (typeof initRoomCategoryChart === 'function' && 
+                typeof updateRoomCategoryChart === 'function' && 
+                document.getElementById('roomCategoryChart')) {
+                
+                console.log('Reinitializing room category chart');
+                window.roomCategoryChart = window.roomCategoryChart || initRoomCategoryChart();
+                if (window.roomCategoryChart) {
+                    updateRoomCategoryChart();
+                }
+            }
+            
+            // Registry-based initialization
+            if (window.novaEraCharts && window.novaEraCharts.updateAll) {
+                window.novaEraCharts.updateAll();
+            }
+        }, 300);
+    };
+
+    // Listen for route/navigation changes in Laravel/Livewire
+    document.addEventListener('livewire:navigated', function() {
+        console.log('Livewire navigation detected, reinitializing charts');
+        if (typeof window.reinitializeDashboardCharts === 'function') {
+            window.reinitializeDashboardCharts();
+        }
+    });
+
+    // On page visibility change (user returns to tab)
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') {
+            console.log('Page visibility changed to visible, checking charts');
+            if (typeof window.reinitializeDashboardCharts === 'function') {
+                window.reinitializeDashboardCharts();
+            }
+        }
+    });
     
     // Track previous values to detect changes
     window.previousValues = {};
@@ -739,5 +836,45 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Basic dashboard initialization
         console.log('Dashboard initialized at', new Date().toISOString());
+        
+        // Ensure charts are initialized and loaded with data
+        setTimeout(() => {
+            // First try our new ensureChartsRendered function
+            if (typeof window.ensureChartsRendered === 'function') {
+                window.ensureChartsRendered();
+            } 
+            // Fallback to previous method
+            else if (typeof window.reinitializeDashboardCharts === 'function') {
+                window.reinitializeDashboardCharts();
+            }
+        }, 500);
+    });
+    
+    // Add a mutation observer to watch for dashboard content changes
+    // This helps with single-page application navigation
+    const dashboardObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.addedNodes.length > 0) {
+                // Check if charts need initialization
+                const chartCanvases = document.querySelectorAll('canvas[id$="Chart"]');
+                if (chartCanvases.length > 0) {
+                    console.log('Chart canvases detected in DOM, ensuring initialization');
+                    if (typeof window.reinitializeDashboardCharts === 'function') {
+                        window.reinitializeDashboardCharts();
+                    }
+                }
+            }
+        });
+    });
+    
+    // Start observing once DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        const dashboardContainer = document.getElementById('dashboard-main-container');
+        if (dashboardContainer) {
+            dashboardObserver.observe(dashboardContainer, { 
+                childList: true, 
+                subtree: true 
+            });
+        }
     });
 </script>
