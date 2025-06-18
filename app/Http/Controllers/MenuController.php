@@ -8,6 +8,16 @@ use Illuminate\Http\Request;
 class MenuController extends Controller
 {
     /**
+     * Constructor to apply authorization middleware
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+        // Add role-based middleware for specific actions
+        $this->authorizeResource(Menu::class, 'menu');
+    }
+    
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)

@@ -1,4 +1,4 @@
-<!-- Cleaning Status Section -->
+{{-- <!-- Cleaning Status Section -->
 <div class="bg-white rounded-lg shadow-lg overflow-hidden">
     <div class="p-4 bg-[#f9b903] text-[#1B1B18]">
         <h2 class="text-xl font-semibold">Housekeeping Status</h2>
@@ -90,4 +90,4 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}

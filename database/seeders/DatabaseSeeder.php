@@ -20,10 +20,10 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
         
-        // Call room category seeder
+        // Call seeders
         $this->call([
             RoomCategorySeeder::class,
-            
+            UserRolesSeeder::class,
         ]);
     }
 }

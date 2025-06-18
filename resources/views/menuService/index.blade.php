@@ -112,6 +112,7 @@
         </div>
 
         <!-- New Order Form -->
+        @can('create-menu-order')
         <div class="bg-white p-4 rounded-lg shadow-sm mb-6">
             <h2 class="text-lg font-medium text-gray-900 mb-4">Create New Food Order</h2>
             <form action="{{ route('menuService.store') }}" method="POST" id="orderForm">
@@ -167,6 +168,7 @@
                 </div>
             </form>
         </div>
+        @endcan
 
         <!-- Current Orders -->
         <div class="mb-4">
@@ -214,6 +216,7 @@
                                         @endif
                                     </form>
                                     
+                                    @can('create-menu-order')
                                     <form action="{{ route('menuService.destroy', $order) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
@@ -221,6 +224,7 @@
                                             Cancel
                                         </button>
                                     </form>
+                                    @endcan
                                 </div>
                             </div>
                         </div>

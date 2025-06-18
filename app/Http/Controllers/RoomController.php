@@ -10,6 +10,16 @@ use App\Models\RoomMenuOrder;
 class RoomController extends Controller
 {
     /**
+     * Constructor to apply authorization middleware
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+        // Add role-based middleware for specific actions
+        $this->authorizeResource(Room::class, 'room');
+    }
+    
+    /**
      * Display the rooms dashboard with comprehensive statistics
      */
     public function dashboard()
@@ -102,6 +112,7 @@ class RoomController extends Controller
         // Support both URL parameter formats (status_filter from traditional filters and statusFilter from Livewire)
         $statusFilter = $request->status_filter ?? $request->statusFilter ?? 'all';
         $cleaningFilter = $request->cleaning_filter ?? $request->cleaningFilter ?? 'all';
+        $categoryFilter = $request->category_filter ?? $request->categoryFilter ?? 'all';
         $searchQuery = $request->search ?? $request->searchQuery ?? '';
         
         // Apply status filter

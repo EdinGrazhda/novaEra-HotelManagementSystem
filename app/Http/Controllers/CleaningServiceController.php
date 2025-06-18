@@ -2,17 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use Log;
+use Illuminate\Support\Facades\Log;
 use App\Models\Room;
 use Illuminate\Http\Request;
 
 class CleaningServiceController extends Controller
 {
     /**
+     * Constructor to apply authorization middleware
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
+    /**
      * Display a listing of the resource with filtering.
      */
     public function index(Request $request)
     {
+        // Check if user has permission to view cleaning information
+        $this->authorize('view-cleaning');
+        
         $query = Room::query();
         
         // Support both URL parameter formats (cleaning_filter from traditional filters and cleaningFilter from Livewire)
@@ -90,6 +101,9 @@ class CleaningServiceController extends Controller
      */
     public function updateCleaningStatus(Request $request, Room $room)
     {
+        // Check if user has permission to update cleaning status
+        $this->authorize('update-cleaning-status');
+        
         try {
             // Log the incoming request data for debugging
             Log::info('Cleaning status update request', [

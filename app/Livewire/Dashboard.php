@@ -53,6 +53,11 @@ class Dashboard extends Component
 
     public function mount()
     {
+        // Check if user has cleaner role and redirect them to cleaning service
+        if (\Illuminate\Support\Facades\Auth::user()->hasRole('cleaner')) {
+            return $this->redirect(route('cleaning.index'), navigate: true);
+        }
+
         logger()->info('Dashboard component mounted at ' . now()->toDateTimeString());
         $this->loadDashboardData();
     }

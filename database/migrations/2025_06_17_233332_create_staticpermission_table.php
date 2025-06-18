@@ -13,20 +13,22 @@ return new class extends Migration
     
     public function up(): void
     {
-        // Devices permissions
+        // System permissions
         $permissions = [
-            'doctorView',
-            'doctorCreate',
-            'doctorEdit',
-            'doctorDelete',
-            'medicineView',
-            'medicineCreate',
-            'medicineEdit',
-            'medicineDelete',
-            'userView',
-            'userCreate',
-            'userEdit',
-            'userDelete'
+           'dashboardView',
+           'roomsView',
+           'roomsCreate',
+           'roomsEdit',
+           'roomsDelete',
+           'menuView',
+           'menuCreate',
+           'menuEdit',
+           'menuDelete',
+           'cleaningView',
+           'cleaningStatusUpdate',
+           'menuCreateOrder',
+           'menuOrderEdit',
+           'manage-roles',
         ];
 
         foreach ($permissions as $permission) {
@@ -40,18 +42,20 @@ return new class extends Migration
     public function down(): void
     {
         $permissions = [
-            'doctorView',
-            'doctorCreate',
-            'doctorEdit',
-            'doctorDelete',
-            'medicineView',
-            'medicineCreate',
-            'medicineEdit',
-            'medicineDelete',
-            'userView',
-            'userCreate',
-            'userEdit',
-            'userDelete'
+            'dashboardView',
+           'roomsView',
+           'roomsCreate',
+           'roomsEdit',
+           'roomsDelete',
+           'menuView',
+           'menuCreate',
+           'menuEdit',
+           'menuDelete',
+           'cleaningView',
+           'cleaningStatusUpdate',
+           'menuCreateOrder',
+           'menuOrderEdit',
+           'manage-roles',
         ];
 
         foreach ($permissions as $permission) {
