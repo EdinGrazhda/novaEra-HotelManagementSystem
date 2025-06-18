@@ -1,4 +1,4 @@
-<style>
+{{-- <style>
     .chart-loading {
         display: flex;
         justify-content: center;
@@ -724,4 +724,4 @@
             }, 1000);
         }
     }
-</script>
+</script> --}}

@@ -16,7 +16,7 @@ Route::get('/', function () {
 Route::get('dashboard', function () {
     return view('dashboard');
 })
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'can:view-dashboard'])
     ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
@@ -26,6 +26,24 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
 
+
+    // Roles and Permissions Management
+  
+        // Roles
+        Route::get('roles', [App\Http\Controllers\RolePermissionController::class, 'index'])->name('roles.index');
+        Route::get('roles/create', [App\Http\Controllers\RolePermissionController::class, 'createRole'])->name('roles.create');
+        Route::post('roles', [App\Http\Controllers\RolePermissionController::class, 'storeRole'])->name('roles.store');
+        Route::get('roles/{role}/edit', [App\Http\Controllers\RolePermissionController::class, 'editRole'])->name('roles.edit');
+        Route::put('roles/{role}', [App\Http\Controllers\RolePermissionController::class, 'updateRole'])->name('roles.update');
+        Route::delete('roles/{role}', [App\Http\Controllers\RolePermissionController::class, 'destroyRole'])->name('roles.destroy');
+        
+        // User-Role assignment
+        Route::get('users/{user}/roles', [App\Http\Controllers\RolePermissionController::class, 'editUserRoles'])->name('users.edit.roles');
+        Route::put('users/{user}/roles', [App\Http\Controllers\RolePermissionController::class, 'updateUserRoles'])->name('users.update.roles');
+        
+        // Permissions
+        Route::get('permissions/create', [App\Http\Controllers\RolePermissionController::class, 'createPermission'])->name('permissions.create');
+        Route::post('permissions', [App\Http\Controllers\RolePermissionController::class, 'storePermission'])->name('permissions.store');
 
     //Rooms
     Route::get('rooms', [RoomController::class, 'index'])->name('rooms.index');

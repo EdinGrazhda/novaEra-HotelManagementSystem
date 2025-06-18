@@ -43,7 +43,22 @@ class Login extends Component
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        $user = Auth::user();
+        
+        // Role-based redirections
+        if ($user->hasRole('cleaner')) {
+            // Cleaners go to cleaning service page
+            $this->redirect(route('cleaning.index'), navigate: true);
+        } elseif ($user->hasRole('receptionist')) {
+            // Receptionists go to rooms page
+            $this->redirect(route('rooms.index'), navigate: true);
+        } elseif ($user->hasRole('chef')) {
+            // Chefs go to menu service page
+            $this->redirect(route('menuService.index'), navigate: true);
+        } else {
+            // Default redirection for admin and other roles
+            $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        }
     }
 
     /**
