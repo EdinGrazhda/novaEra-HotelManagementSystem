@@ -1,6 +1,6 @@
 <!-- Real-time Check In/Out Status Section -->
 <div class="bg-white rounded-lg shadow-lg overflow-hidden" 
-    wire:poll.15s="poll"
+    wire:poll.7s="poll"
     x-data="{
         lastUpdate: '',
         isUpdating: false,
@@ -35,7 +35,7 @@
         <!-- Date Display -->
         <div class="text-center mb-6">
             <p class="text-sm text-gray-500">Today's Date</p>
-            <p class="text-xl font-semibold text-gray-800">{{ now()->format('F j, Y') }}</p>
+            <p class="text-xl font-semibold text-gray-800">{{  now()->format('H:i:s') }}</p>
         </div>
 
         <!-- Activity Stats -->

@@ -1,5 +1,5 @@
 <div>
-    <div wire:poll.15s.keep-alive="poll" class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+    <div wire:poll.10s.keep-alive="poll" class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
         <div class="p-4 bg-[#f9b903] text-[#1B1B18] flex justify-between items-center">
             <h2 class="text-xl font-semibold">Room Status Overview</h2>            <div class="flex items-center">
                 <span class="text-xs text-[#1B1B18] opacity-80 mr-2">Auto-updating</span>
