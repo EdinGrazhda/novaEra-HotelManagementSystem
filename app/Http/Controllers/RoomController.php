@@ -337,4 +337,21 @@ class RoomController extends Controller
         
         return redirect()->back()->with('success', 'Room has been checked out successfully. Cleaning status set to not cleaned.');
     }
+    
+    /**
+     * Manually trigger room status updates based on check-in and check-out times.
+     * This can be used for testing or manual updates.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateRoomStatuses()
+    {
+        // Call the command directly
+        \Artisan::call('rooms:update-statuses');
+        
+        // Get the output
+        $output = \Artisan::output();
+        
+        return redirect()->back()->with('success', 'Room statuses have been updated successfully. ' . $output);
+    }
 }
