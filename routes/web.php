@@ -48,11 +48,12 @@ Route::middleware(['auth'])->group(function () {
     //Rooms
     Route::get('rooms', [RoomController::class, 'index'])->name('rooms.index');
     Route::get('rooms/dashboard', App\Livewire\Dashboard::class)->name('rooms.dashboard');
+    Route::get('rooms/update-statuses', [RoomController::class, 'updateRoomStatuses'])->name('rooms.updateStatuses');
     Route::patch('rooms/{room}/status', [RoomController::class, 'updateStatus'])->name('rooms.updateStatus');
     Route::patch('rooms/{room}/cleaning-status', [RoomController::class, 'updateCleaningStatus'])->name('rooms.updateCleaningStatus');
     Route::patch('rooms/{room}/check-in', [RoomController::class, 'checkIn'])->name('rooms.checkIn');
     Route::patch('rooms/{room}/check-out', [RoomController::class, 'checkOut'])->name('rooms.checkOut');
-    Route::resource('rooms', RoomController::class);
+    Route::resource('rooms', RoomController::class)->except(['index']);
 
 
     //Cleaning Service
@@ -77,6 +78,8 @@ Route::middleware(['auth'])->group(function () {
     
     // Room Calendar
     Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
+
+
 });
 
 require __DIR__.'/auth.php';

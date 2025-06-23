@@ -44,25 +44,7 @@
         });
     </script>
     
-    @if(session('success'))
-        <div id="success-alert" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
-            <div class="flex justify-between items-center">
-                <p>{{ session('success') }}</p>
-                <span class="text-green-700 hover:text-green-800 cursor-pointer" onclick="document.getElementById('success-alert').remove()">×</span>
-            </div>
-        </div>
-
-        <script>
-            // Auto-hide the success message after 5 seconds
-            setTimeout(function() {
-                const alert = document.getElementById('success-alert');
-                if (alert) {
-                    alert.classList.add('opacity-0', 'transition-opacity', 'duration-500');
-                    setTimeout(() => alert.remove(), 500);
-                }
-            }, 1500);
-        </script>
-    @endif
+   
     
     <!-- Filter section -->
     <div class="mb-6 bg-white rounded-lg shadow-md p-4 border border-gray-200">
@@ -117,7 +99,7 @@
             <div class="flex-1">
                 <h3 class="text-sm font-medium text-gray-700 mb-2">Search:</h3>
                 <div class="relative">
-                    <input type="text" wire:model.debounce.300ms="searchQuery" 
+                    <input type="text" wire:model="searchQuery" 
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F8B803] focus:border-transparent"
                            placeholder="Search by room number, floor or category...">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
