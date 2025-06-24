@@ -26,7 +26,18 @@
         --neutral-900: #111827;
         
         /* Status colors */
-        --status-success: #10B981;
+        --status-        <!-- Initialize the monthly chart -->
+        if (document.getElementById('monthlyActivityChart')) {
+            // Show loading indicator
+            const loadingElement = document.getElementById('chart-loading');
+            if (loadingElement) loadingElement.classList.remove('hidden');
+            
+            // Initialize and load data
+            setTimeout(() => {
+                monthlyChart = initMonthlyChart();
+                refreshMonthlyChart();
+            }, 300);
+        }ss: #10B981;
         --status-info: #3B82F6;
         --status-warning: #F59E0B;
         --status-purple: #8B5CF6;
@@ -136,6 +147,13 @@
     
     .animate-bar {
         animation: growWidth 1s ease-out forwards;
+    }
+    
+    /* Chart container styling */
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
     }
     
     /* Active touch styling for mobile */
@@ -355,6 +373,22 @@
 
     <livewire:real-time-food-status />
     
+    <!-- Monthly Check-in/Check-out Chart -->
+    <div class="bg-white rounded-lg shadow-sm p-5 mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold text-gray-800">Monthly Check-in/Check-out Activity</h2>
+            <button onclick="refreshMonthlyChart()" class="text-sm bg-white hover:bg-gray-50 text-gray-800 py-1 px-3 rounded border border-gray-200 flex items-center transition-all">
+                <i class="fas fa-sync-alt mr-1.5 text-[#f9b903]"></i> Refresh Chart
+            </button>
+        </div>
+        <div class="chart-container relative h-80">
+            <canvas id="monthlyActivityChart"></canvas>
+            <div id="chart-loading" class="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center hidden">
+                <div class="w-10 h-10 border-4 border-[#f9b903] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        </div>
+    </div>
+    
     
 
     <div class="mt-10 bg-white rounded-lg shadow-sm overflow-hidden">
@@ -446,12 +480,140 @@
     </div>
 </div>
 
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <!-- Dashboard Scripts -->
 <script>
     // Global refresh function for the dashboard
     function refreshDashboard() {
         if (typeof @this !== 'undefined') {
             @this.refreshDashboard();
+        }
+    }
+    
+    // Monthly check-in/check-out chart
+    // Make sure we don't redeclare the variable if it already exists in window scope
+    if (!window.monthlyChart) {
+        window.monthlyChart = null;
+    }
+    
+    function initMonthlyChart() {
+        // Destroy existing chart instance if it exists to prevent memory leaks
+        if (window.monthlyChart) {
+            window.monthlyChart.destroy();
+        }
+        
+        const canvas = document.getElementById('monthlyActivityChart');
+        if (!canvas) return null;
+        
+        const ctx = canvas.getContext('2d');
+        
+        window.monthlyChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Check-ins',
+                        backgroundColor: '#3B82F6',
+                        data: []
+                    },
+                    {
+                        label: 'Check-outs',
+                        backgroundColor: '#F59E0B',
+                        data: []
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+        
+        return monthlyChart;
+    }
+    
+    function refreshMonthlyChart() {
+        // Make sure we have the canvas element
+        if (!document.getElementById('monthlyActivityChart')) {
+            console.log('Monthly chart canvas not found, skipping refresh');
+            return;
+        }
+        
+        const loadingElement = document.getElementById('chart-loading');
+        if (loadingElement) loadingElement.classList.remove('hidden');
+        
+        console.log('Refreshing monthly chart data...');
+        
+        // Get the data from the server or from the Livewire component
+        if (typeof @this !== 'undefined') {
+            @this.refreshDashboard().then(() => {
+                // First try to get data from API
+                fetch('/api/dashboard/monthly-activity')
+                    .then(response => response.json())
+                    .then(data => {
+                        updateMonthlyChartWithData(data);
+                        if (loadingElement) loadingElement.classList.add('hidden');
+                    })
+                    .catch(error => {
+                        console.error('Error loading chart data:', error);
+                        if (loadingElement) loadingElement.classList.add('hidden');
+                    });
+            });
+        } else {
+            // Fallback to direct API call if not in a Livewire context
+            fetch('/api/dashboard/monthly-activity')
+                .then(response => response.json())
+                .then(data => {
+                    updateMonthlyChartWithData(data);
+                    if (loadingElement) loadingElement.classList.add('hidden');
+                })
+                .catch(error => {
+                    console.error('Error loading chart data:', error);
+                    if (loadingElement) loadingElement.classList.add('hidden');
+                });
+        }
+    }
+    
+    function updateMonthlyChartWithData(data) {
+        try {
+            if (!window.monthlyChart || !document.getElementById('monthlyActivityChart')) {
+                window.monthlyChart = initMonthlyChart();
+            }
+            
+            if (window.monthlyChart) {
+                window.monthlyChart.data.labels = data.map(item => item.month);
+                window.monthlyChart.data.datasets[0].data = data.map(item => item.checkins);
+                window.monthlyChart.data.datasets[1].data = data.map(item => item.checkouts);
+                window.monthlyChart.update();
+                console.log('Monthly chart updated with data:', data);
+            }
+        } catch (error) {
+            console.error('Error updating monthly chart:', error);
         }
     }
     
@@ -572,7 +734,14 @@
         
         // Wait for DOM to be ready
         setTimeout(() => {
-            // Initialize Monthly Trends Chart
+            // Initialize our monthly activity chart
+            if (document.getElementById('monthlyActivityChart')) {
+                console.log('Reinitializing monthly activity chart');
+                window.monthlyChart = initMonthlyChart();
+                refreshMonthlyChart();
+            }
+        
+            // Initialize Monthly Trends Chart (legacy)
             if (typeof window.initMonthlyTrendsChart === 'function' && 
                 typeof window.refreshMonthlyTrendsChart === 'function' && 
                 document.getElementById('monthlyTrendsChart')) {
@@ -619,7 +788,16 @@
         
         console.log('On dashboard page, proceeding with chart reinitialization');
         
-        // Force immediate chart initialization
+        // Check for monthly chart
+        setTimeout(() => {
+            if (document.getElementById('monthlyActivityChart')) {
+                window.monthlyChart = initMonthlyChart();
+                refreshMonthlyChart();
+                console.log('Monthly activity chart reinitialized after navigation');
+            }
+        }, 200);
+        
+        // Force immediate chart initialization for other charts
         if (typeof window.reinitializeDashboardCharts === 'function') {
             window.reinitializeDashboardCharts();
         }
@@ -658,13 +836,21 @@
                 window.reinitializeDashboardCharts();
             }
             
+            // Make sure our monthly chart is refreshed
+            if (document.getElementById('monthlyActivityChart')) {
+                console.log('Refreshing monthly activity chart after tab visibility changed');
+                refreshMonthlyChart();
+            }
+            
             // Then trigger an explicit chart update via Livewire
             setTimeout(() => {
                 if (typeof @this !== 'undefined') {
                     console.log('Triggering explicit chart update');
-                    @this.updateCharts();
-                    
-                    // In Livewire v3, the event will be dispatched by the component method
+                    if (typeof @this.updateCharts === 'function') {
+                        @this.updateCharts();
+                    } else {
+                        @this.refreshDashboard();
+                    }
                 }
             }, 300);
         }
@@ -804,6 +990,12 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Basic dashboard initialization
         console.log('Dashboard initialized at', new Date().toISOString());
+        
+        // Initialize the monthly chart
+        if (document.getElementById('monthlyActivityChart')) {
+            window.monthlyChart = initMonthlyChart();
+            refreshMonthlyChart();
+        }
         
         // Ensure charts are initialized and loaded with data
         setTimeout(() => {

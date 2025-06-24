@@ -19,6 +19,10 @@ Route::get('dashboard', function () {
     ->middleware(['auth', 'verified', 'can:view-dashboard'])
     ->name('dashboard');
 
+// Dashboard API endpoints
+Route::middleware(['auth'])->prefix('api/dashboard')->group(function () {
+    Route::get('/monthly-activity', [App\Http\Controllers\DashboardController::class, 'apiMonthlyTrends'])->name('api.dashboard.monthlyActivity');
+});
 
 
 Route::middleware(['auth'])->group(function () {
