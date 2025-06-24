@@ -30,25 +30,7 @@ class Dashboard extends Component
     
     // Menu order statistics are now handled by RealTimeFoodStatus component
     
-    // Chart data
-    public $monthlyData;
-    public $roomsByCategory;
 
-    /**
-     * Get the monthly data for the chart via JavaScript
-     */
-    public function getChartMonthlyData()
-    {
-        return $this->monthlyData;
-    }
-    
-    /**
-     * Get the room category distribution data for the chart via JavaScript
-     */
-    public function getChartRoomCategories()
-    {
-        return $this->roomsByCategory;
-    }
     
 
     public function mount()
@@ -135,9 +117,6 @@ class Dashboard extends Component
             
             // Menu order statistics are now handled by RealTimeFoodStatus component
             
-            // Monthly statistics for check-ins and check-outs (for charts)
-            $this->monthlyData = $this->getMonthlyData();
-            
             // Detect changes in key metrics
             $changes = [];
             if ($previousValues['cleanRooms'] != $this->cleanRooms) {
@@ -170,9 +149,6 @@ class Dashboard extends Component
         }
         
         try {
-            // Room category distribution
-            $this->roomsByCategory = $this->getRoomCategoryDistribution();
-    
             // Add a unique timestamp to track updates
             $this->lastUpdated = now()->format('H:i:s');
             
@@ -186,47 +162,7 @@ class Dashboard extends Component
         return $this;
     }
 
-    private function getMonthlyData()
-    {
-        $monthlyData = [];
-        $currentMonth = now()->startOfMonth();
-        
-        // Get data for the last 6 months and reverse to show chronologically
-        for ($i = 5; $i >= 0; $i--) {
-            $month = $currentMonth->copy()->subMonths($i);
-            $monthName = $month->format('M Y');
-            
-            $monthlyCheckins = Room::whereMonth('checkin_time', $month->month)
-                ->whereYear('checkin_time', $month->year)
-                ->count();
-                
-            $monthlyCheckouts = Room::whereMonth('checkout_time', $month->month)
-                ->whereYear('checkout_time', $month->year)
-                ->count();
-                
-            $monthlyData[] = [
-                'month' => $monthName,
-                'checkins' => $monthlyCheckins,
-                'checkouts' => $monthlyCheckouts
-            ];
-        }
-        
-        return $monthlyData;
-    }
-    
-    private function getRoomCategoryDistribution()
-    {
-        return Room::with('roomCategory')
-            ->get()
-            ->groupBy('roomCategory.category_name')
-            ->map(function($items, $key) {
-                return [
-                    'category' => $key ?? 'Uncategorized',
-                    'count' => $items->count()
-                ];
-            })
-            ->values();
-    }
+
 
     public function render()
     {
@@ -239,36 +175,35 @@ class Dashboard extends Component
         }
         
         // Ensure data is loaded in case the mount or loadDashboardData didn't execute correctly
+        $dataWasEmpty = false;
+        
         if (empty($this->totalRooms)) {
             $this->totalRooms = Room::count();
+            $dataWasEmpty = true;
         }
         
         if (empty($this->occupiedRooms)) {
             $this->occupiedRooms = Room::where('room_status', 'occupied')->count();
+            $dataWasEmpty = true;
         }
         
         if (empty($this->cleanRooms)) {
             $this->cleanRooms = Room::where('cleaning_status', 'clean')->count();
+            $dataWasEmpty = true;
         }
         
         // Food service statistics are now handled by RealTimeFoodStatus component
         
-        // Always ensure chart data is available
-        if (empty($this->monthlyData)) {
-            $this->monthlyData = $this->getMonthlyData();
-        }
-        
-        if (empty($this->roomsByCategory)) {
-            $this->roomsByCategory = $this->getRoomCategoryDistribution();
-        }
+
         
         // Ensure todayActivity is always available
         if (!isset($this->todayActivity)) {
             $checkinCheckoutStats = \App\Services\DashboardService::getCheckinCheckoutStats();
             $this->todayActivity = $checkinCheckoutStats['todayActivity'];
+            $dataWasEmpty = true;
         }
         
-        // Don't dispatch event in render as it can cause infinite loops with Livewire navigation
+
         
         return view('livewire.dashboard');
     }
@@ -279,13 +214,13 @@ class Dashboard extends Component
      */
     public function hydrate()
     {
-        // Ensure all data is loaded when component is hydrated after navigation
-        if (empty($this->monthlyData) || empty($this->roomsByCategory)) {
-            $this->loadDashboardData();
-        } else {
-            // Just dispatch the event to update charts with existing data
-            $this->dispatch('dashboard-data-updated');
-        }
+        // Log for debugging
+        logger()->info('Dashboard component hydrated at ' . now()->toDateTimeString());
+        
+        // Always reload data when component is hydrated after navigation to ensure fresh data
+        $this->loadDashboardData();
+        
+
     }
     
     /**
@@ -297,6 +232,8 @@ class Dashboard extends Component
         logger()->info('Manual dashboard refresh triggered by user');
         return $this->loadDashboardData();
     }
+    
+
     
     /**
      * Handle component disconnection to reduce polling/resource usage

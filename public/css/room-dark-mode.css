@@ -1,0 +1,295 @@
+/* Dark Mode Specific Styles for Room Cards */
+
+/* Room card backgrounds in dark mode */
+.dark .room-box[data-status="available"] {
+    background-color: rgba(16, 185, 129, 0.25) !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.2) !important; /* Add glow effect */
+}
+
+.dark .room-box[data-status="occupied"] {
+    background-color: rgba(239, 68, 68, 0.25) !important;
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.2) !important; /* Add glow effect */
+}
+
+.dark .room-box[data-status="maintenance"] {
+    background-color: rgba(107, 114, 128, 0.25) !important;
+    border-color: #6b7280 !important;
+    box-shadow: 0 0 15px rgba(107, 114, 128, 0.2) !important; /* Add glow effect */
+}
+
+/* Room info items and text */
+.dark .room-box {
+    color: #f3f4f6 !important; /* Make text more visible with lighter color */
+}
+
+.dark .room-box h3.room-number {
+    color: #ffffff !important; /* Pure white for room numbers */
+    text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5) !important; /* Stronger text shadow for readability */
+    font-size: 1.6rem !important; /* Larger font size */
+    font-weight: 700 !important; /* Bolder font weight */
+    margin-bottom: 8px !important; /* Add more spacing */
+}
+
+.dark .room-box .room-info-item {
+    border-color: rgba(
+        255,
+        255,
+        255,
+        0.2
+    ) !important; /* Lighter border for better visibility */
+    color: #f3f4f6 !important;
+    padding: 6px 0 !important; /* Add more padding for better visibility */
+}
+
+.dark .room-box .room-info-item span:first-child {
+    color: #f3f4f6 !important; /* Much lighter color for labels */
+    font-weight: 600 !important; /* Bold the labels */
+    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5) !important; /* Text shadow for better readability */
+    font-size: 0.95rem !important; /* Slightly larger font */
+}
+
+.dark .room-box .room-info-item span.font-medium {
+    color: #ffffff !important; /* Pure white for values */
+    font-weight: 700 !important; /* Make it bolder for better contrast */
+    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5) !important; /* Text shadow for better readability */
+    font-size: 0.95rem !important; /* Slightly larger font */
+}
+
+/* Card action footer */
+.dark .room-box .bg-white.bg-opacity-50 {
+    background-color: rgba(31, 41, 55, 0.9) !important;
+}
+
+.dark .room-box .border-t {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Make all action buttons more visible */
+.dark .room-box a.text-indigo-600,
+.dark .room-box a.text-yellow-600,
+.dark .room-box .text-red-600,
+.dark .room-box .text-green-600,
+.dark .room-box .text-blue-600 {
+    filter: brightness(1.3); /* Brighten all links */
+    text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Status badges in dark mode */
+.dark .room-status-badge.clean {
+    background-color: rgba(16, 185, 129, 0.25) !important;
+    color: #4ade80 !important; /* Brighter green */
+    border-color: #10b981 !important;
+    font-weight: 600;
+    text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.3);
+}
+
+.dark .room-status-badge.not_cleaned {
+    background-color: rgba(239, 68, 68, 0.25) !important;
+    color: #fca5a5 !important; /* Brighter red */
+    border-color: #ef4444 !important;
+    font-weight: 600;
+    text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.3);
+}
+
+.dark .room-status-badge.in_progress {
+    background-color: rgba(245, 158, 11, 0.25) !important;
+    color: #fcd34d !important; /* Brighter yellow */
+    border-color: #f59e0b !important;
+    font-weight: 600;
+    text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.3);
+}
+
+/* Room type badges in dark mode */
+.dark
+    .inline-flex.items-center.px-2\.5.py-0\.5.rounded-full.text-xs.font-medium.bg-blue-100.text-blue-800 {
+    background-color: rgba(59, 130, 246, 0.3) !important;
+    color: #93c5fd !important; /* Brighter blue */
+    font-weight: 600;
+    box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.2); /* Outline for better visibility */
+}
+
+.dark
+    .inline-flex.items-center.px-2\.5.py-0\.5.rounded-full.text-xs.font-medium.bg-indigo-100.text-indigo-800 {
+    background-color: rgba(99, 102, 241, 0.3) !important;
+    color: #a5b4fc !important; /* Brighter indigo */
+    font-weight: 600;
+    box-shadow: 0 0 0 1px rgba(165, 180, 252, 0.2); /* Outline for better visibility */
+}
+
+.dark
+    .inline-flex.items-center.px-2\.5.py-0\.5.rounded-full.text-xs.font-medium.bg-purple-100.text-purple-800 {
+    background-color: rgba(139, 92, 246, 0.3) !important;
+    color: #c4b5fd !important; /* Brighter purple */
+    font-weight: 600;
+    box-shadow: 0 0 0 1px rgba(196, 181, 253, 0.2); /* Outline for better visibility */
+}
+
+/* Filter buttons */
+.dark .filter-button {
+    border-color: var(--border-color);
+    border-width: 2px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark .filter-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .filter-button.active {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2) !important;
+    font-weight: 700 !important;
+}
+
+.dark .filter-button.text-xs.py-1.px-2.bg-gray-100.text-gray-800 {
+    background-color: rgba(107, 114, 128, 0.2) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark .filter-button.text-xs.py-1.px-2.bg-green-100.text-green-800 {
+    background-color: rgba(16, 185, 129, 0.2) !important;
+    color: #34d399 !important;
+}
+
+.dark .filter-button.text-xs.py-1.px-2.bg-red-100.text-red-800 {
+    background-color: rgba(239, 68, 68, 0.2) !important;
+    color: #f87171 !important;
+}
+
+.dark .filter-button.text-xs.py-1.px-2.bg-yellow-100.text-yellow-800 {
+    background-color: rgba(245, 158, 11, 0.2) !important;
+    color: #fbbf24 !important;
+}
+
+/* Search input */
+.dark input[type="text"].border.border-gray-300 {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.dark input[type="text"].border.border-gray-300:focus {
+    --ring-color: var(--brand-gold);
+}
+
+/* Special styling for check-in/check-out status in dark mode */
+.dark .room-box .room-info-item:last-child {
+    background-color: rgba(31, 41, 55, 0.5) !important;
+    padding: 8px 6px !important;
+    border-radius: 6px !important;
+    margin-top: 6px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .room-box .room-info-item:last-child span:first-child {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+/* Make check-in/check-out status text more visible */
+.dark .room-box .text-green-600 {
+    color: #4ade80 !important; /* Brighter green */
+    font-weight: 700 !important;
+}
+
+.dark .room-box .text-blue-600 {
+    color: #60a5fa !important; /* Brighter blue */
+    font-weight: 700 !important;
+}
+
+.dark .room-box .text-gray-600 {
+    color: #d1d5db !important; /* Lighter gray */
+    font-weight: 600 !important;
+}
+
+/* Enhance the cleaning status badges */
+.dark .room-box .room-status-badge {
+    padding: 5px 8px !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.01em !important;
+}
+
+/* Improve overall room card container visibility in dark mode */
+.dark .room-box {
+    border-width: 3px 1px 1px 1px !important; /* Make top border thicker */
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+.dark .room-box .p-4 {
+    padding: 1.25rem !important; /* More padding inside */
+    background-color: rgba(
+        17,
+        24,
+        39,
+        0.4
+    ) !important; /* Slightly darker background */
+}
+
+/* Add a distinctive header to each room card for better visibility */
+.dark .room-box .p-4 {
+    position: relative !important;
+}
+
+.dark .room-box .p-4::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.2),
+        rgba(255, 255, 255, 0.05)
+    ) !important;
+}
+
+/* Enhance filter section in dark mode */
+.dark .filter-button {
+    border-width: 2px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark .filter-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .filter-button.active {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2) !important;
+    font-weight: 700 !important;
+}
+
+/* Make search more visible */
+.dark .search-input-container {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark input.search-input {
+    background-color: rgba(31, 41, 55, 0.8) !important;
+    color: white !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark input.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.dark input.search-input:focus {
+    box-shadow: 0 0 0 3px rgba(249, 185, 3, 0.3) !important;
+    border-color: rgba(249, 185, 3, 0.5) !important;
+}
+
+/* Make results count more visible */
+.dark .results-count {
+    color: #e5e7eb !important;
+    font-weight: 600 !important;
+}

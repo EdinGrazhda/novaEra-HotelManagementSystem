@@ -88,4 +88,53 @@ class DashboardService
             'fulfillmentRate' => $fulfillmentRate
         ];
     }
+    
+    /**
+     * Get monthly check-in/check-out trends data
+     *
+     * @return array
+     */
+    public function getMonthlyCheckinCheckoutTrends()
+    {
+        $months = [];
+        $checkinCounts = [];
+        $checkoutCounts = [];
+        
+        // Get data for the last 6 months
+        for ($i = 5; $i >= 0; $i--) {
+            $monthDate = now()->subMonths($i);
+            $monthName = $monthDate->format('M');
+            $monthYear = $monthDate->year;
+            
+            // Format month label
+            $monthLabel = $monthName . ' ' . $monthYear;
+            
+            // Count check-ins for this month
+            $checkins = Room::whereYear('checkin_time', $monthDate->year)
+                ->whereMonth('checkin_time', $monthDate->month)
+                ->count();
+                
+            // Count check-outs for this month
+            $checkouts = Room::whereYear('checkout_time', $monthDate->year)
+                ->whereMonth('checkout_time', $monthDate->month)
+                ->count();
+                
+            // Add to arrays
+            $months[] = $monthLabel;
+            $checkinCounts[] = $checkins;
+            $checkoutCounts[] = $checkouts;
+        }
+        
+        // Prepare result
+        $result = [];
+        for ($i = 0; $i < count($months); $i++) {
+            $result[] = [
+                'month' => $months[$i],
+                'checkins' => $checkinCounts[$i],
+                'checkouts' => $checkoutCounts[$i]
+            ];
+        }
+        
+        return $result;
+    }
 }

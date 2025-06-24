@@ -2,14 +2,14 @@
 <div class="bg-white rounded-lg shadow-lg overflow-hidden">
     <div class="p-4 bg-[#f9b903] text-[#1B1B18] flex items-center justify-between">
         <h2 class="text-xl font-semibold">Monthly Check-in/Check-out Trends</h2>
-        <button onclick="refreshChartData()" class="text-xs bg-white hover:bg-gray-100 text-[#1B1B18] transition-colors rounded-full px-3 py-1 flex items-center shadow-sm">
+        <button onclick="refreshMonthlyTrendsChart()" class="text-xs bg-white hover:bg-gray-100 text-[#1B1B18] transition-colors rounded-full px-3 py-1 flex items-center shadow-sm">
             <i class="fas fa-sync-alt mr-1"></i> Refresh
         </button>
     </div>
     <div class="p-6 relative">
         <div class="chart-container">
             <canvas id="monthlyTrendsChart"></canvas>
-            <div class="chart-loading" wire:loading wire:target="loadDashboardData">
+            <div class="chart-loading" style="display: none;">
                 <div class="chart-spinner"></div>
             </div>
         </div>
@@ -25,22 +25,15 @@
         const ctx = document.getElementById('monthlyTrendsChart');
         if (!ctx) return null;
         
-        // Default sample data for immediate display
-        const sampleData = {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            checkins: [15, 22, 18, 25, 30, 28],
-            checkouts: [10, 18, 20, 22, 25, 32]
-        };
-        
         // Chart configuration with CSS variable colors
         const config = {
             type: 'line',
             data: {
-                labels: sampleData.labels,
+                labels: [],
                 datasets: [
                     {
                         label: 'Check-ins',
-                        data: sampleData.checkins,
+                        data: [],
                         borderColor: '#3B82F6', // Bright blue for check-ins
                         backgroundColor: 'rgba(59, 130, 246, 0.15)', // Light blue background
                         tension: 0.4,
@@ -53,7 +46,7 @@
                     },
                     {
                         label: 'Check-outs',
-                        data: sampleData.checkouts,
+                        data: [],
                         borderColor: '#f9b903', // Brand gold for check-outs
                         backgroundColor: 'rgba(249, 185, 3, 0.15)', // Light gold background
                         tension: 0.4,
@@ -73,27 +66,21 @@
                     legend: {
                         position: 'top',
                         labels: {
+                            padding: 15,
                             boxWidth: 12,
-                            usePointStyle: true,
-                            pointStyle: 'circle',
-                            padding: 15
+                            font: {
+                                size: 12
+                            }
                         }
                     },
                     tooltip: {
-                        mode: 'index',
-                        intersect: false,
                         backgroundColor: 'rgba(255, 255, 255, 0.9)',
                         titleColor: '#1B1B18',
                         bodyColor: '#6b7280',
                         borderColor: 'rgba(249, 185, 3, 0.3)',
                         borderWidth: 1,
                         padding: 10,
-                        displayColors: true,
-                        caretSize: 8,
-                        cornerRadius: 8,
-                        titleFont: {
-                            weight: '600'
-                        }
+                        cornerRadius: 8
                     }
                 },
                 scales: {
@@ -101,14 +88,12 @@
                         beginAtZero: true,
                         grid: {
                             drawBorder: false,
-                            color: 'rgba(0, 0, 0, 0.05)'
+                            borderDash: [5, 5]
                         },
                         ticks: {
-                            precision: 0,
                             font: {
                                 size: 11
-                            },
-                            color: 'rgba(0, 0, 0, 0.6)'
+                            }
                         }
                     },
                     x: {
@@ -118,8 +103,7 @@
                         ticks: {
                             font: {
                                 size: 11
-                            },
-                            color: 'rgba(0, 0, 0, 0.6)'
+                            }
                         }
                     }
                 },
@@ -129,8 +113,8 @@
                     intersect: false
                 },
                 elements: {
-                    line: {
-                        borderJoinStyle: 'round'
+                    point: {
+                        radius: 3
                     }
                 }
             }
@@ -156,19 +140,16 @@
         
         // If chart doesn't exist, initialize it first
         if (!chart) {
-            console.log('Chart not found, initializing first');
+            console.log('Monthly trends chart not found, initializing first');
             monthlyTrendsChart = initMonthlyTrendsChart();
-            if (!monthlyTrendsChart) return; // Exit if initialization failed
+            if (!monthlyTrendsChart) {
+                console.error('Failed to initialize monthly trends chart');
+                return;
+            }
         }
         
-        // Reference to the chart we'll update (either from the registry or local var)
+        // Reference to the chart we'll update
         const chartToUpdate = chart || monthlyTrendsChart;
-        
-        // Make sure Livewire is initialized
-        if (typeof @this === 'undefined') {
-            console.error('Livewire component not initialized yet');
-            return;
-        }
         
         // Show loading state
         const container = document.querySelector('#monthlyTrendsChart').closest('.chart-container');
@@ -179,101 +160,43 @@
             }
         }
         
-        // Try to get data with exponential backoff
-        let attempts = 0;
-        const maxAttempts = 5;
-        
-        function attemptDataLoad() {
-            attempts++;
-            console.log(`Attempt ${attempts} to load monthly chart data`);
-            
-            @this.getChartMonthlyData().then(monthlyData => {
-                // Hide loading indicator
+        // Fetch fresh data from the server
+        fetch('/api/charts/monthly')
+            .then(response => response.json())
+            .then(data => {
                 if (container && container.querySelector('.chart-loading')) {
                     container.querySelector('.chart-loading').style.display = 'none';
                 }
                 
-                if (monthlyData && monthlyData.length) {
-                    console.log('Monthly data loaded successfully:', monthlyData.length, 'items');
-                    
-                    const labels = monthlyData.map(item => item.month);
-                    const checkins = monthlyData.map(item => item.checkins);
-                    const checkouts = monthlyData.map(item => item.checkouts);
+                if (data && data.length) {
+                    const labels = data.map(item => item.month);
+                    const checkins = data.map(item => item.checkins);
+                    const checkouts = data.map(item => item.checkouts);
                     
                     chartToUpdate.data.labels = labels;
                     chartToUpdate.data.datasets[0].data = checkins;
                     chartToUpdate.data.datasets[1].data = checkouts;
                     
                     chartToUpdate.update('normal');
-                } else if (attempts < maxAttempts) {
-                    console.log(`No data received, retrying in ${500 * attempts}ms...`);
-                    setTimeout(attemptDataLoad, 500 * attempts); // Exponential backoff
                 } else {
-                    console.error('Failed to load monthly data after', maxAttempts, 'attempts');
+                    console.error('No monthly trends data received');
                 }
-            }).catch(err => {
-                console.error('Error loading monthly data:', err);
-                if (attempts < maxAttempts) {
-                    setTimeout(attemptDataLoad, 500 * attempts);
+            })
+            .catch(error => {
+                console.error('Error refreshing monthly trend data:', error);
+                if (container && container.querySelector('.chart-loading')) {
+                    container.querySelector('.chart-loading').style.display = 'none';
                 }
             });
-        }
-        
-        // Start the first attempt
-        attemptDataLoad();
     }
     
-    // Initialize the chart when Livewire is ready
-    document.addEventListener('livewire:initialized', () => {
-        // Use a timeout to ensure DOM is fully rendered
+    // Initialize the chart when the DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
-            monthlyTrendsChart = monthlyTrendsChart || initMonthlyTrendsChart();
+            monthlyTrendsChart = initMonthlyTrendsChart();
             if (monthlyTrendsChart) {
                 updateMonthlyTrendsChart();
             }
         }, 100);
-    });
-    
-    // Re-initialize chart when navigating back to dashboard
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-            // Check if canvas exists and has no chart attached
-            const ctx = document.getElementById('monthlyTrendsChart');
-            if (ctx && !ctx.chart && typeof Chart !== 'undefined') {
-                console.log('Reinitializing monthly trends chart after page visibility change');
-                setTimeout(() => {
-                    // If chart instance exists but is stale, destroy it
-                    if (monthlyTrendsChart && monthlyTrendsChart.destroyed) {
-                        monthlyTrendsChart = null;
-                    }
-                    
-                    // Reinitialize if needed
-                    monthlyTrendsChart = monthlyTrendsChart || initMonthlyTrendsChart();
-                    if (monthlyTrendsChart) {
-                        updateMonthlyTrendsChart();
-                    }
-                }, 300);
-            }
-        }
-    });
-    
-    // Also listen for Alpine JS hook when navigation occurs
-    document.addEventListener('alpine:navigated', () => {
-        console.log('Navigation detected, ensuring monthly chart is initialized');
-        setTimeout(() => {
-            const ctx = document.getElementById('monthlyTrendsChart');
-            if (ctx && typeof Chart !== 'undefined') {
-                // If chart instance exists but is stale, destroy it
-                if (monthlyTrendsChart && (monthlyTrendsChart.destroyed || !ctx.chart)) {
-                    monthlyTrendsChart = null;
-                }
-                
-                // Reinitialize if needed
-                monthlyTrendsChart = monthlyTrendsChart || initMonthlyTrendsChart();
-                if (monthlyTrendsChart) {
-                    updateMonthlyTrendsChart();
-                }
-            }
-        }, 300);
     });
 </script>

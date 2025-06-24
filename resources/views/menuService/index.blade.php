@@ -10,20 +10,39 @@
             border-radius: 0.5rem;
             transition: all 0.3s ease;
         }
+        .dark .menu-service-card {
+            border-color: #374151;
+            background-color: #1f2937;
+        }
         .menu-service-card:hover {
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .dark .menu-service-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
         }
         .status-received {
             background-color: #dbeafe;
             color: #1e40af;
         }
+        .dark .status-received {
+            background-color: rgba(29, 78, 216, 0.2);
+            color: #93c5fd;
+        }
         .status-in_process {
             background-color: #fef9c3;
             color: #854d0e;
         }
+        .dark .status-in_process {
+            background-color: rgba(161, 98, 7, 0.2);
+            color: #fcd34d;
+        }
         .status-delivered {
             background-color: #dcfce7;
             color: #166534;
+        }
+        .dark .status-delivered {
+            background-color: rgba(22, 101, 52, 0.2);
+            color: #86efac;
         }
         .quantity-control {
             display: flex;
@@ -51,8 +70,8 @@
 
     <div class="container mx-auto px-4 py-8">
         <div class="mb-6">
-            <h1 class="text-2xl font-bold text-[#1B1B18]">Menu Service</h1>
-            <p class="text-gray-600">Assign menu items to rooms and manage food orders</p>
+            <h1 class="text-2xl font-bold text-[#1B1B18] dark:text-white">Menu Service</h1>
+            <p class="text-gray-600 dark:text-gray-300">Assign menu items to rooms and manage food orders</p>
         </div>
 
         <!-- Filter and search bar -->

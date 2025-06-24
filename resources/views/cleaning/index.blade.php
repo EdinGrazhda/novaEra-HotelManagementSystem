@@ -1,16 +1,19 @@
 <x-layouts.app :title="__('Cleaning Room')">
 <!-- Include custom CSS for cleaning -->
 <link href="{{ asset('css/cleaning.css') }}" rel="stylesheet">
+<link href="{{ asset('css/rooms.css') }}" rel="stylesheet">
 <link href="{{ asset('css/room-overrides.css') }}" rel="stylesheet">
 <link href="{{ asset('css/room-card-fixes.css') }}" rel="stylesheet">
 <link href="{{ asset('css/room-status-colors.css') }}" rel="stylesheet">
 <link href="{{ asset('css/cleaning-colors.css') }}" rel="stylesheet">
+<link href="{{ asset('css/room-dark-mode.css') }}" rel="stylesheet">
+<link href="{{ asset('css/cleaning-dark-mode.css') }}" rel="stylesheet">
 <!-- Add CSRF Token meta tag -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <div class="container mx-auto px-4 py-8">
     <div class="mb-6 flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-[#1B1B18]">Cleaning Management</h1>
+        <h1 class="text-2xl font-bold text-[#1B1B18] dark:text-white">Cleaning Management</h1>
     </div>
     
     @if(session('success'))

@@ -1,0 +1,267 @@
+/* Dark mode variables and overrides */
+:root {
+    /* Light mode colors - default */
+    --text-primary: #1b1b18;
+    --text-secondary: #4b5563;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --border-color: #e5e7eb;
+    --card-bg: #ffffff;
+    --hover-bg: #f3f4f6;
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+
+    /* Brand colors */
+    --brand-gold: #f9b903;
+    --brand-gold-light: rgba(249, 185, 3, 0.15);
+    --brand-gold-lighter: rgba(249, 185, 3, 0.05);
+    --brand-gold-dark: #e6aa00;
+
+    /* Status colors */
+    --status-success: #10b981;
+    --status-info: #3b82f6;
+    --status-warning: #f59e0b;
+    --status-purple: #8b5cf6;
+    --status-danger: #ef4444;
+}
+
+/* Dark theme variables */
+.dark-theme,
+.dark {
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --bg-primary: #111827;
+    --bg-secondary: #1f2937;
+    --border-color: #374151;
+    --card-bg: #1f2937;
+    --hover-bg: #374151;
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.24);
+
+    /* Status colors in dark mode */
+    --status-success-light: rgba(16, 185, 129, 0.2);
+    --status-info-light: rgba(59, 130, 246, 0.2);
+    --status-warning-light: rgba(245, 158, 11, 0.2);
+    --status-purple-light: rgba(139, 92, 246, 0.2);
+    --status-danger-light: rgba(239, 68, 68, 0.2);
+}
+
+/* General dark mode styles */
+.dark body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.dark .bg-white {
+    background-color: var(--card-bg) !important;
+}
+
+.dark .border {
+    border-color: var(--border-color) !important;
+}
+
+/* Fix for the brand color text (#1B1B18) used in many templates */
+.dark [class*="text-[#1B1B18]"] {
+    color: var(--text-primary) !important;
+}
+
+.dark .text-gray-800,
+.dark .text-gray-900,
+.dark .text-gray-700 {
+    color: var(--text-primary) !important;
+}
+
+.dark .text-gray-600,
+.dark .text-gray-500 {
+    color: var(--text-secondary) !important;
+}
+
+/* Card styles */
+.dark .room-box,
+.dark .dashboard-stat-card,
+.dark .menu-service-card {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Shadow adjustments for dark mode */
+.dark .shadow,
+.dark .shadow-sm,
+.dark .shadow-lg,
+.dark .shadow-md {
+    box-shadow: var(--shadow) !important;
+}
+
+/* Button styles for dark mode */
+.dark .bg-blue-600 {
+    background-color: #2563eb !important;
+}
+
+.dark .bg-purple-600 {
+    background-color: #7c3aed !important;
+}
+
+.dark .hover\:bg-blue-700:hover {
+    background-color: #1d4ed8 !important;
+}
+
+.dark .hover\:bg-purple-700:hover {
+    background-color: #6d28d9 !important;
+}
+
+/* Alert styles */
+.dark .bg-green-100 {
+    background-color: rgba(16, 185, 129, 0.2) !important;
+    color: #34d399 !important;
+}
+
+.dark .bg-red-100 {
+    background-color: rgba(239, 68, 68, 0.2) !important;
+    color: #f87171 !important;
+}
+
+.dark .border-green-400,
+.dark .border-green-500 {
+    border-color: #34d399 !important;
+}
+
+.dark .border-red-400,
+.dark .border-red-500 {
+    border-color: #f87171 !important;
+}
+
+/* Room status colors for dark mode */
+.dark .room-box[data-status="available"] {
+    background-color: rgba(16, 185, 129, 0.1) !important;
+    border-color: rgba(16, 185, 129, 0.5) !important;
+}
+
+.dark .room-box[data-status="occupied"] {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+    border-color: rgba(239, 68, 68, 0.5) !important;
+}
+
+.dark .room-box[data-status="maintenance"] {
+    background-color: rgba(107, 114, 128, 0.1) !important;
+    border-color: rgba(107, 114, 128, 0.5) !important;
+}
+
+/* Room status badges */
+.dark .room-status-badge.clean {
+    background-color: rgba(16, 185, 129, 0.2) !important;
+    color: #34d399 !important;
+    border-color: #059669 !important;
+}
+
+.dark .room-status-badge.not_cleaned {
+    background-color: rgba(239, 68, 68, 0.2) !important;
+    color: #f87171 !important;
+    border-color: #dc2626 !important;
+}
+
+.dark .room-status-badge.in_progress {
+    background-color: rgba(245, 158, 11, 0.2) !important;
+    color: #fbbf24 !important;
+    border-color: #d97706 !important;
+}
+
+/* Table styles */
+.dark table {
+    border-color: var(--border-color) !important;
+}
+
+.dark thead th {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark tbody tr {
+    border-color: var(--border-color) !important;
+}
+
+.dark tbody tr:hover {
+    background-color: var(--hover-bg) !important;
+}
+
+/* Form elements */
+.dark input,
+.dark select,
+.dark textarea {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+    border-color: var(--brand-gold) !important;
+    box-shadow: 0 0 0 3px rgba(249, 185, 3, 0.3) !important;
+}
+
+/* Calendar specific */
+.dark .fc-theme-standard .fc-scrollgrid,
+.dark .fc-theme-standard td,
+.dark .fc-theme-standard th {
+    border-color: var(--border-color) !important;
+}
+
+.dark .fc .fc-col-header-cell-cushion {
+    color: var(--text-primary) !important;
+}
+
+.dark .fc .fc-daygrid-day-number {
+    color: var(--text-primary) !important;
+}
+
+.dark .fc-daygrid-day-events {
+    color: var(--text-primary) !important;
+}
+
+.dark .fc-toolbar-title {
+    color: var(--text-primary) !important;
+}
+
+.dark .fc-button-primary {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark .fc-button-active {
+    background-color: var(--brand-gold) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Menu Service specific dark mode styles */
+.dark .status-received {
+    background-color: rgba(59, 130, 246, 0.2) !important;
+    color: #93c5fd !important;
+}
+
+.dark .status-in_process {
+    background-color: rgba(245, 158, 11, 0.2) !important;
+    color: #fcd34d !important;
+}
+
+.dark .status-delivered {
+    background-color: rgba(16, 185, 129, 0.2) !important;
+    color: #34d399 !important;
+}
+
+/* Overrides for specific elements in dashboard */
+.dark .bg-gray-50 {
+    background-color: var(--bg-secondary) !important;
+}
+
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-gray-300 {
+    border-color: var(--border-color) !important;
+}
+
+.dark .bg-gradient-to-r.from-\[\#f9b903\]\/10.to-white {
+    background-image: linear-gradient(
+        to right,
+        rgba(249, 185, 3, 0.1),
+        var(--card-bg)
+    ) !important;
+}

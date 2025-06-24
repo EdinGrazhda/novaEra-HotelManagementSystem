@@ -1,0 +1,61 @@
+/* Roles and Permissions page dark mode styles */
+
+.dark .bg-indigo-100.text-indigo-800 {
+    background-color: rgba(79, 70, 229, 0.2) !important;
+    color: #a5b4fc !important;
+    border: 1px solid rgba(79, 70, 229, 0.4);
+}
+
+.dark .bg-green-100.text-green-800 {
+    background-color: rgba(16, 185, 129, 0.2) !important;
+    color: #34d399 !important;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+/* Role and permission management action buttons */
+.dark .text-indigo-600.hover\:text-indigo-900 {
+    color: #a5b4fc !important;
+}
+
+.dark .text-indigo-600.hover\:text-indigo-900:hover,
+.dark .text-indigo-400.hover\:text-indigo-300:hover {
+    color: #c7d2fe !important;
+}
+
+.dark .text-red-600.hover\:text-red-900 {
+    color: #f87171 !important;
+}
+
+.dark .text-red-600.hover\:text-red-900:hover,
+.dark .text-red-400.hover\:text-red-300:hover {
+    color: #fca5a5 !important;
+}
+
+/* Flash messages */
+.dark #success-alert {
+    background-color: rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #34d399;
+}
+
+.dark #error-alert {
+    background-color: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #f87171;
+}
+
+/* Tables with striping */
+.dark .divide-gray-200 > tr:nth-child(even),
+.dark .divide-gray-200 > tr:nth-child(even) td {
+    background-color: rgba(31, 41, 55, 0.5) !important;
+}
+
+.dark .divide-gray-200 > tr:nth-child(odd),
+.dark .divide-gray-200 > tr:nth-child(odd) td {
+    background-color: rgba(17, 24, 39, 0.7) !important;
+}
+
+/* Table hover effects */
+.dark tbody tr:hover td {
+    background-color: rgba(55, 65, 81, 0.5) !important;
+}
