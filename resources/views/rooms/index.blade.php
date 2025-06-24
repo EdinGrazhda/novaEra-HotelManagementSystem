@@ -5,10 +5,11 @@
 <link href="{{ asset('css/room-card-fixes.css') }}" rel="stylesheet">
 <link href="{{ asset('css/room-status-colors.css') }}" rel="stylesheet">
 <link href="{{ asset('css/room-status-only.css') }}" rel="stylesheet">
+<link href="{{ asset('css/room-dark-mode.css') }}" rel="stylesheet">
 
 <div class="container mx-auto px-4 py-8">
     <div class="mb-6 flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-[#1B1B18]">Room Management</h1>
+        <h1 class="text-2xl font-bold text-[#1B1B18] dark:text-white">Room Management</h1>
         <div class="flex space-x-3">
             <a href="{{ route('rooms.updateStatuses') }}" class="px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">

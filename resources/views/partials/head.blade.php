@@ -12,3 +12,6 @@
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 @fluxAppearance
+
+<!-- Dark Mode Support for all sidebar pages -->
+@include('partials.dark-mode')

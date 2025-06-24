@@ -824,7 +824,6 @@
         window.dashboardObserver = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 if (mutation.addedNodes.length > 0) {
-                    // Check if charts need initialization
                     const chartCanvases = document.querySelectorAll('canvas[id$="Chart"]');
                     if (chartCanvases.length > 0) {
                         console.log('Chart canvases detected in DOM, ensuring initialization');

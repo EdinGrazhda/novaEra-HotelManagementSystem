@@ -1,7 +1,10 @@
 <x-layouts.app :title="__('Menu')">
+    <!-- Include custom CSS for menu dark mode -->            
+    <link href="{{ asset('css/menu-dark-mode.css') }}" rel="stylesheet">
+    
     <div class="container mx-auto px-4 py-8">
         <div class="mb-6 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-[#1B1B18]">Menu Management</h1>
+            <h1 class="text-2xl font-bold text-[#1B1B18] dark:text-white">Menu Management</h1>
             <a href="{{ route('menu.create') }}" class="px-4 py-2 bg-[#F8B803] text-[#1B1B18] font-medium rounded-md hover:bg-yellow-500 transition duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
