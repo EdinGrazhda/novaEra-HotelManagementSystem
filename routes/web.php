@@ -73,7 +73,8 @@ Route::middleware(['auth'])->group(function () {
     
 
     //Menu Service
-    Route::get('menuService', [App\Http\Controllers\MenuServiceController::class, 'index'])->name('menuService.index');
+    Route::get('menuService', [App\Http\Controllers\MenuServiceController::class, 'livewireIndex'])->name('menuService.index');
+    Route::get('menuService/legacy', [App\Http\Controllers\MenuServiceController::class, 'index'])->name('menuService.legacy');
     Route::post('menuService', [App\Http\Controllers\MenuServiceController::class, 'store'])->name('menuService.store');
     Route::patch('menuService/{roomMenuOrder}/update-status', [App\Http\Controllers\MenuServiceController::class, 'updateStatus'])->name('menuService.updateStatus');
     Route::delete('menuService/{roomMenuOrder}', [App\Http\Controllers\MenuServiceController::class, 'destroy'])->name('menuService.destroy');
