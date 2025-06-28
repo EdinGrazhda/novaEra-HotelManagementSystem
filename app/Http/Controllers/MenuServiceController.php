@@ -11,6 +11,14 @@ use Illuminate\Support\Facades\DB;
 class MenuServiceController extends Controller
 {
     /**
+     * Display the livewire version of the menu service.
+     */
+    public function livewireIndex()
+    {
+        return view('menuService.livewire-index');
+    }
+    
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
