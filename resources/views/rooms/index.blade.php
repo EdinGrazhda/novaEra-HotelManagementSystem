@@ -6,22 +6,26 @@
 <link href="{{ asset('css/room-status-colors.css') }}" rel="stylesheet">
 <link href="{{ asset('css/room-status-only.css') }}" rel="stylesheet">
 <link href="{{ asset('css/room-dark-mode.css') }}" rel="stylesheet">
+<link href="{{ asset('css/mobile-responsive.css') }}" rel="stylesheet">
 
-<div class="container mx-auto px-4 py-8">
-    <div class="mb-6 flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-[#1B1B18] dark:text-white">Room Management</h1>
-        <div class="flex space-x-3">
-            <a href="{{ route('rooms.updateStatuses') }}" class="px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition duration-200">
+<!-- Force light mode as default -->
+<script src="{{ asset('js/light-mode.js') }}"></script>
+
+<div class="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+    <div class="mb-6 flex flex-col sm:flex-row justify-between items-center">
+        <h1 class="text-2xl font-bold text-[#1B1B18] dark:text-white mb-4 sm:mb-0">Room Management</h1>
+        <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+            <a href="{{ route('rooms.updateStatuses') }}" class="px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition duration-200 text-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
                 </svg>
-                Update Room Statuses
+                <span class="whitespace-nowrap">Update Room Statuses</span>
             </a>
-            <a href="{{ route('rooms.create') }}" class="px-4 py-2 bg-[#F8B803] text-[#1B1B18] font-medium rounded-md hover:bg-yellow-500 transition duration-200">
+            <a href="{{ route('rooms.create') }}" class="px-4 py-2 bg-[#F8B803] text-[#1B1B18] font-medium rounded-md hover:bg-yellow-500 transition duration-200 text-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
                 </svg>
-                Add New Room
+                <span class="whitespace-nowrap">Add New Room</span>
             </a>
         </div>
     </div>
