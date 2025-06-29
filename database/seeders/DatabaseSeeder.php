@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoomCategorySeeder::class,
             UserRolesSeeder::class,
+            UserPermissionSeeder::class,
         ]);
     }
 }

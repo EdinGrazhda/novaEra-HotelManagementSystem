@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('partials.head')
     </head>
@@ -61,6 +61,15 @@
                     <flux:navlist.group :heading="__('Roles & Permissions')" class="grid">
                         @can('manage-roles')
                         <flux:navlist.item icon="shield-check" :href="route('roles.index')" :current="request()->routeIs('roles.index')">{{ __('Manage Roles') }}</flux:navlist.item>
+                        @endcan
+                       
+                    </flux:navlist.group>
+                    @endrole
+
+                       @role('admin')
+                    <flux:navlist.group :heading="__('User Management')" class="grid">
+                        @can('manage-users')
+                        <flux:navlist.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.*')">{{ __('Manage Users') }}</flux:navlist.item>
                         @endcan
                     </flux:navlist.group>
                     @endrole

@@ -47,11 +47,11 @@
    
     
     <!-- Filter section -->
-    <div class="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+    <div class="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 sm:p-4 border border-gray-200 dark:border-gray-700">
+        <div class="flex flex-col gap-4">
             <!-- Room Status Filter -->
-            <div class="flex-1">
-                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Room Status Filter:</h3>
+            <div>
+                <h3 class="text-sm font-medium text-gray-800 dark:text-gray-300 mb-2">Room Status Filter:</h3>
                 <div class="flex flex-wrap gap-1">
                     <button wire:click="$set('statusFilter', 'all')" 
                             class="filter-button text-xs py-1 px-2 bg-gray-100 text-gray-800 hover:bg-gray-200 {{ $statusFilter === 'all' ? 'active' : '' }}">
@@ -73,8 +73,8 @@
             </div>
             
             <!-- Cleaning Status Filter -->
-            <div class="flex-1">
-                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cleaning Status Filter:</h3>
+            <div>
+                <h3 class="text-sm font-medium text-gray-800 dark:text-gray-300 mb-2">Cleaning Status Filter:</h3>
                 <div class="flex flex-wrap gap-1">
                     <button wire:click="$set('cleaningFilter', 'all')" 
                             class="filter-button text-xs py-1 px-2 bg-gray-100 text-gray-800 hover:bg-gray-200 {{ $cleaningFilter === 'all' ? 'active' : '' }}">
@@ -96,8 +96,8 @@
             </div>
             
             <!-- Search Bar -->
-            <div class="flex-1">
-                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search:</h3>
+            <div>
+                <h3 class="text-sm font-medium text-gray-800 dark:text-gray-300 mb-2">Search:</h3>
                 <div class="relative search-input-container">
                     <input type="text" wire:model="searchQuery" 
                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F8B803] focus:border-transparent search-input"
@@ -112,7 +112,7 @@
         </div>
         
         <!-- Results count -->
-        <div class="mt-4 text-sm text-gray-600 dark:text-gray-400 results-count">
+        <div class="mt-4 text-sm text-gray-700 dark:text-gray-400 results-count">
             <p>Showing {{ count($rooms) }} room{{ count($rooms) != 1 ? 's' : '' }}</p>
         </div>
     </div>
@@ -183,9 +183,9 @@
                     </div>
                 </div>
                 
-                <div class="bg-white dark:bg-gray-800 bg-opacity-50 dark:bg-opacity-50 px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 bg-opacity-50 dark:bg-opacity-50 px-3 py-3 border-t border-gray-200 dark:border-gray-700">
                     <!-- Action buttons -->
-                    <div class="flex justify-between items-center">
+                    <div class="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-2">
                         <div class="flex space-x-3">
                             <a href="{{ route('rooms.show', $room->id) }}" class="text-indigo-600 hover:text-indigo-900" title="View">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

@@ -1,0 +1,95 @@
+/* Mobile-responsive CSS for Room Management */
+
+/* Light mode styles */
+html:not(.dark) .filter-button {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+html:not(.dark) .room-box {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+html:not(.dark) .room-number {
+    color: #1b1b18;
+}
+
+html:not(.dark) .room-info-label {
+    color: #6b7280;
+}
+
+html:not(.dark) .room-info-value {
+    color: #111827;
+}
+
+/* Extra small screen breakpoint */
+@media (min-width: 480px) {
+    .xs\:flex-row {
+        flex-direction: row !important;
+    }
+    .xs\:items-center {
+        align-items: center !important;
+    }
+    .xs\:grid-cols-1 {
+        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+}
+
+/* Small screen adjustments */
+@media (max-width: 640px) {
+    .room-box {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Make buttons more touch-friendly on mobile */
+    .filter-button {
+        padding: 0.5rem 0.75rem;
+        margin-bottom: 0.25rem;
+    }
+
+    /* Better spacing for mobile */
+    .p-4 {
+        padding: 0.75rem !important;
+    }
+
+    /* Make action buttons more touch-friendly */
+    .room-box svg {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    /* Improve touch targets */
+    .room-box a,
+    .room-box button {
+        padding: 0.25rem;
+    }
+
+    /* Full width buttons on very small screens */
+    @media (max-width: 360px) {
+        .room-box .flex {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .room-box .space-x-3 > * {
+            margin-left: 0;
+            margin-right: 0.5rem;
+        }
+    }
+}
+
+/* Fix filters for small screens */
+@media (max-width: 480px) {
+    .filter-button {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.5rem;
+    }
+}
+
+/* Make rooms take more width on smaller screens */
+@media (max-width: 768px) {
+    .container {
+        max-width: 100% !important;
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+}
