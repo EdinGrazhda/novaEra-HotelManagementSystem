@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CleaningServiceController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\UserController;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Appearance;
@@ -12,6 +13,9 @@ use App\Http\Controllers\CalendarController;
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+// Route testing (for debugging) - comment out in production
+// Route::get('/route-test', [App\Http\Controllers\RouteTestController::class, 'listRoutes'])->name('route.test');
 
 Route::get('dashboard', function () {
     return view('dashboard');
@@ -46,6 +50,9 @@ Route::middleware(['auth'])->group(function () {
         // Permissions
         Route::get('permissions/create', [App\Http\Controllers\RolePermissionController::class, 'createPermission'])->name('permissions.create');
         Route::post('permissions', [App\Http\Controllers\RolePermissionController::class, 'storePermission'])->name('permissions.store');
+        
+        // User Management
+        Route::resource('users', UserController::class)->middleware('can:manage-users');
 
     //Rooms
     Route::get('rooms', [RoomController::class, 'index'])->name('rooms.index');
@@ -81,7 +88,6 @@ Route::middleware(['auth'])->group(function () {
     
     // Room Calendar
     Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
-
 
 });
 

@@ -62,6 +62,15 @@
                         @can('manage-roles')
                         <flux:navlist.item icon="shield-check" :href="route('roles.index')" :current="request()->routeIs('roles.index')">{{ __('Manage Roles') }}</flux:navlist.item>
                         @endcan
+                       
+                    </flux:navlist.group>
+                    @endrole
+
+                       @role('admin')
+                    <flux:navlist.group :heading="__('User Management')" class="grid">
+                        @can('manage-users')
+                        <flux:navlist.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.*')">{{ __('Manage Users') }}</flux:navlist.item>
+                        @endcan
                     </flux:navlist.group>
                     @endrole
                     
