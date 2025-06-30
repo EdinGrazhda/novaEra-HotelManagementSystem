@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CleaningServiceController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\UserController;
 use App\Livewire\Settings\Profile;
@@ -14,8 +15,10 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Route testing (for debugging) - comment out in production
-// Route::get('/route-test', [App\Http\Controllers\RouteTestController::class, 'listRoutes'])->name('route.test');
+// Contact routes
+Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
+Route::post('/contact/send', [ContactController::class, 'send'])->name('contact.send');
+
 
 Route::get('dashboard', function () {
     return view('dashboard');

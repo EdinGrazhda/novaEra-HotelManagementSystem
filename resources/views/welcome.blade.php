@@ -460,6 +460,20 @@
                 color: var(--yellow);
             }
             
+            .contact-link {
+                display: inline-block;
+                margin-top: 10px;
+                padding: 5px 15px;
+                background-color: rgba(255,255,255,0.1);
+                border-radius: 20px;
+                transition: all 0.3s ease;
+            }
+            
+            .contact-link:hover {
+                background-color: var(--yellow);
+                color: var(--soft-black);
+            }
+            
             .footer-social {
                 display: flex;
                 gap: 1rem;
@@ -569,6 +583,7 @@
                         <a href="#features">Features</a>
                         <a href="#benefits">Benefits</a>
                         <a href="#testimonials">Testimonials</a>
+                        <a href="{{ route('contact.index') }}">Contact</a>
                         
                         @auth
                             <a href="{{ route('dashboard') }}" class="btn btn-primary">Dashboard</a>
@@ -755,60 +770,61 @@
                 @auth
                     <a href="{{ route('dashboard') }}" class="btn cta-btn">Go to Dashboard</a>
                 @else
-                    <a href="{{ route('register') }}" class="btn cta-btn">Request a Demo</a>
+                    <a href="{{ route('contact.index') }}" class="btn cta-btn">Request a Demo</a>
                 @endauth
             </div>
         </section>
 
         <!-- Footer -->
+          <!-- Footer -->
         <footer class="footer">
             <div class="container">
                 <div class="footer-grid">
                     <div class="footer-col">
                         <h4>NovaERA HMS</h4>
                         <p>Modern hotel management system designed to streamline operations and enhance guest experiences.</p>
-                        <div class="footer-social">
+                        {{-- <div class="footer-social">
                             <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
                             <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
                             <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
                             <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
+                        </div> --}}
                     </div>
                     <div class="footer-col">
                         <h4>Solutions</h4>
                         <ul class="footer-links">
-                            <li><a href="#">Reservation System</a></li>
-                            <li><a href="#">Front Desk Management</a></li>
-                            <li><a href="#">Housekeeping</a></li>
-                            <li><a href="#">Revenue Management</a></li>
-                            <li><a href="#">Channel Manager</a></li>
+                            <li>Room Managemen</li>
+                            <li>Menu Menagement</li>
+                            <li>Cleaning Menagement</li>
+                            <li>Service Menagement</li>
+                            <li>Realtime Services</li>
                         </ul>
                     </div>
-                    <div class="footer-col">
+                    {{-- <div class="footer-col">
                         <h4>Company</h4>
                         <ul class="footer-links">
                             <li><a href="#">About Us</a></li>
                             <li><a href="#">Our Team</a></li>
                             <li><a href="#">Careers</a></li>
                             <li><a href="#">Press & Media</a></li>
-                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
                         </ul>
-                    </div>
+                    </div> --}}
                     <div class="footer-col">
                         <h4>Contact</h4>
                         <ul class="footer-links">
-                            <li><i class="fas fa-map-marker-alt"></i> 123 Hotel Street, City, Country</li>
-                            <li><i class="fas fa-phone"></i> +1 234 567 890</li>
+                            <li><i class="fas fa-map-marker-alt"></i> Kosovo , Prizren</li>
+                            <li><i class="fas fa-phone"></i> +383 49821554</li>
                             <li><i class="fas fa-envelope"></i> info@novaera-hms.com</li>
+                            <li><a href="{{ route('contact.index') }}" class="contact-link"><i class="fas fa-paper-plane"></i> Contact Us</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="footer-bottom">
-                    <p>&copy; 2023 NovaERA Hotel Management System. All Rights Reserved.</p>
+                    <p>&copy; {{ date('Y') }} NovaERA Hotel Management System. All Rights Reserved.</p>
                 </div>
             </div>
         </footer>
-
         <!-- JavaScript -->
         <script>
             // Mobile menu toggle
