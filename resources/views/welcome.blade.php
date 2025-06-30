@@ -307,49 +307,85 @@
                 margin-top: 5px;
             }
 
-            /* Testimonials */
-            .testimonials {
+            /* System Showcase with Laptop Frame */
+            .system-showcase {
                 padding: 5rem 0;
                 background-color: var(--white);
             }
             
-            .testimonials-wrapper {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 2rem;
-                margin-top: 3rem;
+            .laptop-frame-container {
+                max-width: 900px;
+                margin: 3rem auto;
+                padding: 0 1rem;
             }
             
-            .testimonial-card {
-                background-color: var(--white);
-                padding: 2rem;
-                border-radius: 10px;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            .laptop-frame {
                 position: relative;
+                width: 100%;
+                perspective: 2000px;
             }
             
-            .quote-icon {
+            .laptop-screen {
+                position: relative;
+                width: 100%;
+                height: 0;
+                padding-bottom: 62.5%; /* 16:10 aspect ratio */
+                background-color: #000;
+                border-radius: 15px 15px 0 0;
+                border: 20px solid #555;
+                border-bottom: none;
+                overflow: hidden;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            }
+            
+            .laptop-keyboard {
+                height: 20px;
+                background: linear-gradient(to bottom, #888, #666);
+                border-radius: 0 0 15px 15px;
+                position: relative;
+                transform: perspective(1000px) rotateX(6deg);
+                transform-origin: top center;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            }
+            
+            .laptop-keyboard:after {
+                content: '';
                 position: absolute;
-                top: -15px;
-                left: 20px;
-                font-size: 2rem;
-                color: var(--yellow);
-                opacity: 0.2;
+                width: 15%;
+                height: 4px;
+                background-color: #444;
+                bottom: 8px;
+                left: 42.5%;
+                border-radius: 5px;
             }
             
-            .testimonial-text {
-                font-style: italic;
-                margin-bottom: 1rem;
+            .laptop-slider {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
             }
             
-            .testimonial-author {
-                font-weight: 600;
-                color: var(--soft-black);
+            .slide {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                opacity: 0;
+                transition: opacity 1s ease-in-out;
             }
-
-            .testimonial-hotel {
-                color: var(--gray);
-                font-size: 0.9rem;
+            
+            .slide.active {
+                opacity: 1;
+            }
+            
+            .slide img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
             }
 
             /* CTA */
@@ -424,6 +460,20 @@
                 color: var(--yellow);
             }
             
+            .contact-link {
+                display: inline-block;
+                margin-top: 10px;
+                padding: 5px 15px;
+                background-color: rgba(255,255,255,0.1);
+                border-radius: 20px;
+                transition: all 0.3s ease;
+            }
+            
+            .contact-link:hover {
+                background-color: var(--yellow);
+                color: var(--soft-black);
+            }
+            
             .footer-social {
                 display: flex;
                 gap: 1rem;
@@ -466,6 +516,10 @@
                 .section-title, .cta-title {
                     font-size: 2rem;
                 }
+                
+                .laptop-screen {
+                    border-width: 15px;
+                }
             }
             
             @media screen and (max-width: 768px) {
@@ -502,6 +556,20 @@
                     flex-direction: column;
                     align-items: center;
                 }
+                
+                .laptop-screen {
+                    border-width: 10px;
+                }
+            }
+            
+            @media screen and (max-width: 480px) {
+                .laptop-screen {
+                    border-width: 8px;
+                }
+                
+                .laptop-keyboard {
+                    height: 15px;
+                }
             }
         </style>
     </head>
@@ -515,6 +583,7 @@
                         <a href="#features">Features</a>
                         <a href="#benefits">Benefits</a>
                         <a href="#testimonials">Testimonials</a>
+                        <a href="{{ route('contact.index') }}">Contact</a>
                         
                         @auth
                             <a href="{{ route('dashboard') }}" class="btn btn-primary">Dashboard</a>
@@ -656,34 +725,38 @@
             </div>
         </section>
 
-        <!-- Testimonials Section -->
-        <section id="testimonials" class="testimonials">
+        <!-- System Showcase Section -->
+        <section id="testimonials" class="system-showcase">
             <div class="container">
-                <h2 class="section-title">What Our Clients Say</h2>
-                <div class="testimonials-wrapper">
-                    <div class="testimonial-card">
-                        <div class="quote-icon">
-                            <i class="fas fa-quote-left"></i>
+                <h2 class="section-title">NovaERA HMS in Action</h2>
+                <div class="laptop-frame-container">
+                    <div class="laptop-frame">
+                        <div class="laptop-screen">
+                            <div class="laptop-slider">
+                                <div class="slide active">
+                                    <img src="{{ asset('images/roomss.png') }}" alt="Dashboard Screenshot" />
+                                </div>
+                                <div class="slide">
+                                    <img src="{{ asset('images/menu.png') }}" alt="Booking System" />
+                                </div>
+                                <div class="slide">
+                                    <img src="{{ asset('images/cleaning service.png') }}" alt="Room Management" />
+                                </div>
+                                <div class="slide">
+                                    <img src="{{ asset('images/Menu Service.png') }}" alt="Analytics Dashboard" />
+                                </div>
+                                  <div class="slide">
+                                    <img src="{{ asset('images/roomCalendar.png') }}" alt="Analytics Dashboard" />
+                                </div>
+                                 <div class="slide">
+                                    <img src="{{ asset('images/manageRoles.png') }}" alt="Analytics Dashboard" />
+                                </div>
+                                      <div class="slide">
+                                    <img src="{{ asset('images/users.png') }}" alt="Analytics Dashboard" />
+                                </div>
+                            </div>
                         </div>
-                        <p class="testimonial-text">NovaERA HMS has transformed how we manage our boutique hotel. The system is intuitive, comprehensive, and has helped us increase our occupancy rate by 25%.</p>
-                        <div class="testimonial-author">Sarah Johnson</div>
-                        <div class="testimonial-hotel">General Manager, Horizon Boutique Hotel</div>
-                    </div>
-                    <div class="testimonial-card">
-                        <div class="quote-icon">
-                            <i class="fas fa-quote-left"></i>
-                        </div>
-                        <p class="testimonial-text">The customer support team is exceptional. They guided us through implementation and continue to help us maximize the system's capabilities. Best decision we made!</p>
-                        <div class="testimonial-author">Michael Rodriguez</div>
-                        <div class="testimonial-hotel">Operations Director, Grand Plaza Resort</div>
-                    </div>
-                    <div class="testimonial-card">
-                        <div class="quote-icon">
-                            <i class="fas fa-quote-left"></i>
-                        </div>
-                        <p class="testimonial-text">The reporting features have given us insights we never had before. We've been able to optimize our pricing strategy and significantly increase our RevPAR.</p>
-                        <div class="testimonial-author">Emma Thompson</div>
-                        <div class="testimonial-hotel">Revenue Manager, Skyline Hotels Group</div>
+                        <div class="laptop-keyboard"></div>
                     </div>
                 </div>
             </div>
@@ -697,60 +770,61 @@
                 @auth
                     <a href="{{ route('dashboard') }}" class="btn cta-btn">Go to Dashboard</a>
                 @else
-                    <a href="{{ route('register') }}" class="btn cta-btn">Request a Demo</a>
+                    <a href="{{ route('contact.index') }}" class="btn cta-btn">Request a Demo</a>
                 @endauth
             </div>
         </section>
 
         <!-- Footer -->
+          <!-- Footer -->
         <footer class="footer">
             <div class="container">
                 <div class="footer-grid">
                     <div class="footer-col">
                         <h4>NovaERA HMS</h4>
                         <p>Modern hotel management system designed to streamline operations and enhance guest experiences.</p>
-                        <div class="footer-social">
+                        {{-- <div class="footer-social">
                             <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
                             <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
                             <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
                             <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
+                        </div> --}}
                     </div>
                     <div class="footer-col">
                         <h4>Solutions</h4>
                         <ul class="footer-links">
-                            <li><a href="#">Reservation System</a></li>
-                            <li><a href="#">Front Desk Management</a></li>
-                            <li><a href="#">Housekeeping</a></li>
-                            <li><a href="#">Revenue Management</a></li>
-                            <li><a href="#">Channel Manager</a></li>
+                            <li>Room Managemen</li>
+                            <li>Menu Menagement</li>
+                            <li>Cleaning Menagement</li>
+                            <li>Service Menagement</li>
+                            <li>Realtime Services</li>
                         </ul>
                     </div>
-                    <div class="footer-col">
+                    {{-- <div class="footer-col">
                         <h4>Company</h4>
                         <ul class="footer-links">
                             <li><a href="#">About Us</a></li>
                             <li><a href="#">Our Team</a></li>
                             <li><a href="#">Careers</a></li>
                             <li><a href="#">Press & Media</a></li>
-                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
                         </ul>
-                    </div>
+                    </div> --}}
                     <div class="footer-col">
                         <h4>Contact</h4>
                         <ul class="footer-links">
-                            <li><i class="fas fa-map-marker-alt"></i> 123 Hotel Street, City, Country</li>
-                            <li><i class="fas fa-phone"></i> +1 234 567 890</li>
+                            <li><i class="fas fa-map-marker-alt"></i> Kosovo , Prizren</li>
+                            <li><i class="fas fa-phone"></i> +383 49821554</li>
                             <li><i class="fas fa-envelope"></i> info@novaera-hms.com</li>
+                            <li><a href="{{ route('contact.index') }}" class="contact-link"><i class="fas fa-paper-plane"></i> Contact Us</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="footer-bottom">
-                    <p>&copy; 2023 NovaERA Hotel Management System. All Rights Reserved.</p>
+                    <p>&copy; {{ date('Y') }} NovaERA Hotel Management System. All Rights Reserved.</p>
                 </div>
             </div>
         </footer>
-
         <!-- JavaScript -->
         <script>
             // Mobile menu toggle
@@ -769,6 +843,31 @@
                     }
                 });
             });
+            
+            // Laptop frame image slider
+            (function() {
+                const slides = document.querySelectorAll('.laptop-slider .slide');
+                let currentSlide = 0;
+                
+                function showSlide(index) {
+                    slides.forEach(slide => slide.classList.remove('active'));
+                    slides[index].classList.add('active');
+                }
+                
+                function nextSlide() {
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    showSlide(currentSlide);
+                }
+                
+                // Initialize slider
+                if (slides.length > 0) {
+                    // Make sure first slide is active
+                    showSlide(0);
+                    
+                    // Auto rotate every 3 seconds
+                    setInterval(nextSlide, 3000);
+                }
+            })();
         </script>
     </body>
 </html>
