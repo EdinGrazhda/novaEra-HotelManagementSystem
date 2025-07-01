@@ -38,15 +38,25 @@ class MenuController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255|unique:menu,name',
+                'description' => 'required|string',
+            ]);
 
-        Menu::create($request->all());
+            Menu::create($request->all());
 
-        return redirect()->route('menu.index')
-                        ->with('success', 'Menu item created successfully.');
+            return redirect()->route('menu.index')
+                            ->with('success', 'Menu item created successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                            ->withErrors($e->validator)
+                            ->withInput();
+        } catch (\Exception $e) {
+            return redirect()->back()
+                            ->withErrors(['name' => 'A menu item with this name already exists.'])
+                            ->withInput();
+        }
     }
 
     /**
@@ -70,15 +80,25 @@ class MenuController extends Controller
      */
     public function update(Request $request, Menu $menu)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255|unique:menu,name,' . $menu->id,
+                'description' => 'required|string',
+            ]);
 
-        $menu->update($request->all());
+            $menu->update($request->all());
 
-        return redirect()->route('menu.index')
-                        ->with('success', 'Menu item updated successfully.');
+            return redirect()->route('menu.index')
+                            ->with('success', 'Menu item updated successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                            ->withErrors($e->validator)
+                            ->withInput();
+        } catch (\Exception $e) {
+            return redirect()->back()
+                            ->withErrors(['name' => 'A menu item with this name already exists.'])
+                            ->withInput();
+        }
     }
 
     /**

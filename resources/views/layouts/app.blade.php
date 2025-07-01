@@ -6,6 +6,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'NovaERA HMS') }}</title>
+    
+    <!-- Set light mode as default -->
+    <script src="{{ asset('js/light-mode.js') }}"></script>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,6 +20,7 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="{{ asset('js/flux-init.js') }}"></script>
 
     <style>
         :root {
