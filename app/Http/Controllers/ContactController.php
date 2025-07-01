@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactFormSubmission;
 
@@ -34,14 +35,23 @@ class ContactController extends Controller
             'message' => 'required|string',
         ]);
 
-        // For now, we'll just return with success (you can implement actual email sending later)
-        return back()->with('success', 'Thank you for your message! We will get back to you soon.');
-
-        /* 
-         * To implement actual email sending, uncomment this code and create the Mail class:
-         *
-         * Mail::to('info@novaera-hms.com')->send(new ContactFormSubmission($validated));
-         * return redirect()->route('contact.index')->with('success', 'Thank you for your message! We will get back to you soon.');
-         */
+        try {
+            // Send email to your email address
+            Mail::to('edingrazhda17@gmail.com')
+                ->send(new ContactFormSubmission($validated));
+            
+            // Log successful submission for debugging
+            Log::info('Contact form submitted by: ' . $validated['name'] . ' (' . $validated['email'] . ')');
+            
+            // Success response
+            return back()->with('success', 'Thank you for your message! We will get back to you soon.');
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Contact form email error: ' . $e->getMessage());
+            
+            // User-friendly error message
+            return back()->with('error', 'Sorry, we could not send your message at this time. Please try again later.')
+                        ->withInput();
+        }
     }
 }

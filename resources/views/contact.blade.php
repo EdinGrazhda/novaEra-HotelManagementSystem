@@ -351,6 +351,13 @@
                 </div>
             @endif
             
+            @if (session('error'))
+                <div class="alert-box error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>{{ session('error') }}</p>
+                </div>
+            @endif
+            
             @if ($errors->any())
                 <div class="alert-box error">
                     <i class="fas fa-exclamation-circle"></i>
@@ -427,6 +434,10 @@
                         <h2>Send Us a Message</h2>
                         <div class="accent-line"></div>
                     </div>
+                    
+                
+                    
+                    
                     
                     <form action="{{ route('contact.send') }}" method="POST" class="modern-form">
                         @csrf
@@ -845,6 +856,33 @@
         font-size: 0.85rem;
         margin-top: 5px;
         display: block;
+    }
+    
+    /* Alert Messages */
+    .alert {
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+    }
+    
+    .alert i {
+        margin-right: 10px;
+        font-size: 18px;
+    }
+    
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
     }
     
     /* Submit Button */
