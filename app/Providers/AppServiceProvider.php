@@ -29,6 +29,9 @@ class AppServiceProvider extends ServiceProvider
         // Register the RoomMenuOrder observer for real-time food order updates
         RoomMenuOrder::observe(RoomMenuOrderObserver::class);
         
+        // Register the LightModeAppearance component
+        \Illuminate\Support\Facades\Blade::component('light-mode-appearance', \App\View\Components\LightModeAppearance::class);
+        
         // Global event listener for room updates affecting cleaning status
         // This ensures that any updates to rooms from anywhere in the app will
         // properly trigger the dashboard to update
