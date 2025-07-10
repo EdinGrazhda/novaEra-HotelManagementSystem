@@ -189,5 +189,10 @@
         @endforelse
     </div>
 
+    <!-- Pagination -->
+    <div class="mt-4 px-4 py-2 bg-white rounded-lg shadow-md">
+        {{ $cleaning->links() }}
+    </div>
+
     <!-- Loading indicator removed for seamless real-time updates -->
 </div>

@@ -33,12 +33,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         // Define gates based on permissions
-        Gate::before(function (User $user, $ability) {
-            // Admin has all permissions
-            if ($user->hasRole('admin')) {
-                return true;
-            }
-        });
+        // Removed admin bypass - now admins also need specific permissions
 
         // Dashboard gate
         Gate::define('view-dashboard', function (User $user) {
@@ -91,13 +86,32 @@ class AuthServiceProvider extends ServiceProvider
         // Menu order gates
         Gate::define('create-menu-order', function (User $user) {
             return $user->hasPermissionTo('menuCreateOrder');
-        });        Gate::define('edit-menu-order', function (User $user) {
+        });        
+        
+        Gate::define('edit-menu-order', function (User $user) {
             return $user->hasPermissionTo('menuOrderEdit');
+        });
+        
+        // Menu service gate
+        Gate::define('view-menu-service', function (User $user) {
+            // Reuse the menu view permission for menu service
+            return $user->hasPermissionTo('menuView');
+        });
+        
+        // Calendar gate
+        Gate::define('view-calendar', function (User $user) {
+            // Use rooms view permission for calendar since it's related to room management
+            return $user->hasPermissionTo('roomsView');
         });
         
         // Role management gate
         Gate::define('manage-roles', function (User $user) {
             return $user->hasPermissionTo('manage-roles');
+        });
+        
+        // User management gate
+        Gate::define('manage-users', function (User $user) {
+            return $user->hasPermissionTo('manage-users');
         });
     }
 }

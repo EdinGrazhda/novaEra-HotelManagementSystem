@@ -10,6 +10,9 @@ class MenuList extends Component
 {
     use WithPagination;
     
+    // Use Tailwind theme for pagination
+    protected $paginationTheme = 'tailwind';
+    
     public $search = '';
     
     // This will trigger the search every time the search property changes
@@ -30,7 +33,8 @@ class MenuList extends Component
             });
         }
         
-        $menus = $query->get();
+        // Paginate with 5 items per page
+        $menus = $query->paginate(5);
         
         return view('livewire.menu.menu-list', [
             'menus' => $menus

@@ -3,13 +3,20 @@
 namespace App\Livewire;
 
 use App\Models\Room;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class RoomStatusList extends Component
 {
+    use WithPagination;
+    
     public $statusFilter = 'all';
     public $cleaningFilter = 'all';
     public $searchQuery = '';
+    
+    // Use Tailwind CSS pagination
+    protected $paginationTheme = 'tailwind';
     
     protected $queryString = [
         'statusFilter' => ['except' => 'all'],
@@ -34,6 +41,7 @@ class RoomStatusList extends Component
     public function updatedStatusFilter()
     {
         $this->dispatch('filterChanged');
+        $this->resetPage();
         
         // Update URL parameter when filter changes
         $this->dispatch('urlChanged', [
@@ -46,6 +54,7 @@ class RoomStatusList extends Component
     public function updatedCleaningFilter()
     {
         $this->dispatch('filterChanged');
+        $this->resetPage();
         
         // Update URL parameter when filter changes
         $this->dispatch('urlChanged', [
@@ -58,6 +67,7 @@ class RoomStatusList extends Component
     public function updatedSearchQuery()
     {
         $this->dispatch('filterChanged');
+        $this->resetPage();
         
         // Update URL parameter when search changes
         $this->dispatch('urlChanged', [
@@ -133,7 +143,8 @@ class RoomStatusList extends Component
             });
         }
         
-        $rooms = $roomsQuery->orderBy('room_number')->get();
+        // Paginate the results instead of get()
+        $rooms = $roomsQuery->orderBy('room_number')->paginate(10);
         
         return view('livewire.room-status-list', [
             'rooms' => $rooms

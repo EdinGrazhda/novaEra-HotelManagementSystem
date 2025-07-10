@@ -593,7 +593,7 @@
                             </form>
                         @else
                             <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
-                            <a href="{{ route('register') }}" class="btn btn-secondary">Register</a>
+                            {{-- <a href="{{ route('register') }}" class="btn btn-secondary">Register</a> --}}
                         @endauth
                     </div>
                     <div class="mobile-menu-btn">

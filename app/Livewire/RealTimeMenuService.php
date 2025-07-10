@@ -8,9 +8,15 @@ use App\Models\RoomMenuOrder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\WithPagination;
 
 class RealTimeMenuService extends Component
 {
+    use WithPagination;
+    
+    // Use Tailwind theme for pagination
+    protected $paginationTheme = 'tailwind';
+    
     public $rooms;
     public $menuItems;
     public $orders;
@@ -48,7 +54,7 @@ class RealTimeMenuService extends Component
                 });
             })
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
             
         $this->lastUpdated = now()->format('H:i:s');
         $this->dispatch('orders-updated', timestamp: $this->lastUpdated);
@@ -63,17 +69,20 @@ class RealTimeMenuService extends Component
     public function setStatusFilter($value)
     {
         $this->statusFilter = $value;
+        $this->resetPage(); // Reset pagination when filter changes
         $this->loadOrders();
     }
 
     public function setRoomFilter($value)
     {
         $this->roomFilter = $value;
+        $this->resetPage(); // Reset pagination when filter changes
         $this->loadOrders();
     }
 
     public function updatedSearch()
     {
+        $this->resetPage(); // Reset pagination when search changes
         $this->loadOrders();
     }
 

@@ -263,5 +263,10 @@
         @endforelse
     </div>
 
+    <!-- Pagination -->
+    <div class="mt-6">
+        {{ $rooms->links() }}
+    </div>
+
     <!-- Loading indicator removed for seamless real-time updates -->
 </div>

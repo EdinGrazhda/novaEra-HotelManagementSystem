@@ -1,9 +1,7 @@
 <?php
 
 use App\Http\Controllers\CleaningServiceController;
-use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MenuController;
-use App\Http\Controllers\UserController;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Appearance;
@@ -15,18 +13,11 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Contact routes
-Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
-Route::post('/contact/send', [ContactController::class, 'send'])->name('contact.send');
-
-
 Route::get('dashboard', function () {
     return view('dashboard');
 })
     ->middleware(['auth', 'verified', 'can:view-dashboard'])
     ->name('dashboard');
-
-
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
@@ -36,36 +27,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
 
 
-    // Roles and Permissions Management
-  
-        // Roles
-        Route::get('roles', [App\Http\Controllers\RolePermissionController::class, 'index'])->name('roles.index');
-        Route::get('roles/create', [App\Http\Controllers\RolePermissionController::class, 'createRole'])->name('roles.create');
-        Route::post('roles', [App\Http\Controllers\RolePermissionController::class, 'storeRole'])->name('roles.store');
-        Route::get('roles/{role}/edit', [App\Http\Controllers\RolePermissionController::class, 'editRole'])->name('roles.edit');
-        Route::put('roles/{role}', [App\Http\Controllers\RolePermissionController::class, 'updateRole'])->name('roles.update');
-        Route::delete('roles/{role}', [App\Http\Controllers\RolePermissionController::class, 'destroyRole'])->name('roles.destroy');
-        
-        // User-Role assignment
-        Route::get('users/{user}/roles', [App\Http\Controllers\RolePermissionController::class, 'editUserRoles'])->name('users.edit.roles');
-        Route::put('users/{user}/roles', [App\Http\Controllers\RolePermissionController::class, 'updateUserRoles'])->name('users.update.roles');
-        
-        // Permissions
-        Route::get('permissions/create', [App\Http\Controllers\RolePermissionController::class, 'createPermission'])->name('permissions.create');
-        Route::post('permissions', [App\Http\Controllers\RolePermissionController::class, 'storePermission'])->name('permissions.store');
-        
-        // User Management
-        Route::resource('users', UserController::class)->middleware('can:manage-users');
-
     //Rooms
     Route::get('rooms', [RoomController::class, 'index'])->name('rooms.index');
-    Route::get('rooms/dashboard', App\Livewire\Dashboard::class)->name('rooms.dashboard');
+    Route::get('rooms/dashboard', [RoomController::class, 'dashboard'])->name('rooms.dashboard');
     Route::get('rooms/update-statuses', [RoomController::class, 'updateRoomStatuses'])->name('rooms.updateStatuses');
     Route::patch('rooms/{room}/status', [RoomController::class, 'updateStatus'])->name('rooms.updateStatus');
     Route::patch('rooms/{room}/cleaning-status', [RoomController::class, 'updateCleaningStatus'])->name('rooms.updateCleaningStatus');
     Route::patch('rooms/{room}/check-in', [RoomController::class, 'checkIn'])->name('rooms.checkIn');
     Route::patch('rooms/{room}/check-out', [RoomController::class, 'checkOut'])->name('rooms.checkOut');
-    Route::resource('rooms', RoomController::class)->except(['index']);
+    Route::resource('rooms', RoomController::class);
 
 
     //Cleaning Service
@@ -83,15 +53,42 @@ Route::middleware(['auth'])->group(function () {
     
 
     //Menu Service
-    Route::get('menuService', [App\Http\Controllers\MenuServiceController::class, 'livewireIndex'])->name('menuService.index');
-    Route::get('menuService/legacy', [App\Http\Controllers\MenuServiceController::class, 'index'])->name('menuService.legacy');
+    Route::get('menuService', [App\Http\Controllers\MenuServiceController::class, 'index'])->name('menuService.index');
     Route::post('menuService', [App\Http\Controllers\MenuServiceController::class, 'store'])->name('menuService.store');
     Route::patch('menuService/{roomMenuOrder}/update-status', [App\Http\Controllers\MenuServiceController::class, 'updateStatus'])->name('menuService.updateStatus');
     Route::delete('menuService/{roomMenuOrder}', [App\Http\Controllers\MenuServiceController::class, 'destroy'])->name('menuService.destroy');
     
     // Room Calendar
     Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
-
+    
+    // Roles and Permissions
+    Route::prefix('roles')->name('roles.')->group(function () {
+        Route::get('/', [App\Http\Controllers\RolePermissionController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\RolePermissionController::class, 'createRole'])->name('create');
+        Route::post('/', [App\Http\Controllers\RolePermissionController::class, 'storeRole'])->name('store');
+        Route::get('/{role}/edit', [App\Http\Controllers\RolePermissionController::class, 'editRole'])->name('edit');
+        Route::put('/{role}', [App\Http\Controllers\RolePermissionController::class, 'updateRole'])->name('update');
+        Route::delete('/{role}', [App\Http\Controllers\RolePermissionController::class, 'destroyRole'])->name('destroy');
+    });
+    
+    // Permissions Management
+    Route::prefix('permissions')->name('permissions.')->group(function () {
+        Route::get('/create', [App\Http\Controllers\RolePermissionController::class, 'createPermission'])->name('create');
+        Route::post('/', [App\Http\Controllers\RolePermissionController::class, 'storePermission'])->name('store');
+    });
+    
+    // User Roles Management
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [App\Http\Controllers\UserController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\UserController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\UserController::class, 'store'])->name('store');
+        Route::get('/{user}', [App\Http\Controllers\UserController::class, 'show'])->name('show');
+        Route::get('/{user}/edit', [App\Http\Controllers\UserController::class, 'edit'])->name('edit');
+        Route::put('/{user}', [App\Http\Controllers\UserController::class, 'update'])->name('update');
+        Route::delete('/{user}', [App\Http\Controllers\UserController::class, 'destroy'])->name('destroy');
+        Route::get('/{user}/roles', [App\Http\Controllers\RolePermissionController::class, 'editUserRoles'])->name('edit.roles');
+        Route::put('/{user}/roles', [App\Http\Controllers\RolePermissionController::class, 'updateUserRoles'])->name('update.roles');
+    });
 });
 
 require __DIR__.'/auth.php';

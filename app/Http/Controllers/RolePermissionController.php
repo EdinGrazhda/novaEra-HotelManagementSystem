@@ -17,11 +17,22 @@ class RolePermissionController extends Controller
      */
     public function index()
     {
-        $roles = Role::all();
+        $roles = Role::paginate(5);
         $permissions = Permission::all();
         $users = User::with('roles')->get();
         
         return view('rolesPermissions.index', compact('roles', 'permissions', 'users'));
+    }
+    
+    /**
+     * Display a listing of users and their roles.
+     */
+    public function usersIndex()
+    {
+        $users = User::with('roles')->paginate(5);
+        $roles = Role::all();
+        
+        return view('rolesPermissions.users', compact('users', 'roles'));
     }
     
     /**

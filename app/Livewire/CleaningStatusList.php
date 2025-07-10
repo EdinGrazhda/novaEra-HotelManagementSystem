@@ -4,9 +4,14 @@ namespace App\Livewire;
 
 use App\Models\Room;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class CleaningStatusList extends Component
 {
+    use WithPagination;
+    
+    // Use Tailwind theme for pagination
+    protected $paginationTheme = 'tailwind';
     public $cleaningFilter = 'all';
     public $searchQuery = '';
     
@@ -29,8 +34,10 @@ class CleaningStatusList extends Component
     
     public function updatedCleaningFilter()
     {
-        $this->dispatch('filterChanged');
+        // Reset pagination when filter changes
+        $this->resetPage();
         
+        $this->dispatch('filterChanged');
        
         $this->dispatch('urlChanged', [
             'cleaningFilter' => $this->cleaningFilter !== 'all' ? $this->cleaningFilter : null,
@@ -40,8 +47,10 @@ class CleaningStatusList extends Component
     
     public function updatedSearchQuery()
     {
-        $this->dispatch('filterChanged');
+        // Reset pagination when search query changes
+        $this->resetPage();
         
+        $this->dispatch('filterChanged');
         
         $this->dispatch('urlChanged', [
             'cleaningFilter' => $this->cleaningFilter !== 'all' ? $this->cleaningFilter : null,
@@ -94,7 +103,8 @@ class CleaningStatusList extends Component
             });
         }
         
-        $cleaning = $cleaningQuery->orderBy('room_number')->get();
+        // Paginate with 10 items per page
+        $cleaning = $cleaningQuery->orderBy('room_number')->paginate(10);
         
         return view('livewire.cleaning-status-list', [
             'cleaning' => $cleaning

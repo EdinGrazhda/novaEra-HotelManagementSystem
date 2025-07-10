@@ -12,23 +12,22 @@
             </a>
 
             <flux:navlist variant="outline">
-                @role('admin')
                 <flux:navlist.group :heading="__('Platform')" class="grid">
+                    @can('view-dashboard')
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+                    @endcan
+                    
+                    @can('view-rooms')
                     <flux:navlist.item icon="numbered-list" :href="route('rooms.index')" :current="request()->routeIs('rooms.index')" wire:navigate>{{ __('Rooms') }}</flux:navlist.item>
+                    @endcan
+                    
+                    @can('view-menu')
                     <flux:navlist.item icon="squares-plus" :href="route('menu.index')" :current="request()->routeIs('menu.index')" wire:navigate>{{ __('Menu') }}</flux:navlist.item>
+                    @endcan
                 </flux:navlist.group>
-                @endrole
-
-                @role('receptionist')
-                <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item icon="numbered-list" :href="route('rooms.index')" :current="request()->routeIs('rooms.index')" wire:navigate>{{ __('Rooms') }}</flux:navlist.item>
-                    <flux:navlist.item icon="squares-plus" :href="route('menu.index')" :current="request()->routeIs('menu.index')" wire:navigate>{{ __('Menu') }}</flux:navlist.item>
-                </flux:navlist.group>
-                @endrole
                 
                 <flux:navlist.group :heading="__('Services')" class="grid">
-                    @role(['admin', 'receptionist', 'cleaner'])
+                    @can('view-cleaning')
                     <flux:navlist.item 
                         icon="pencil-square" 
                         :href="route('cleaning.index')" 
@@ -37,42 +36,37 @@
                         onclick="sessionStorage.setItem('sidebarNavigation', 'cleaning');">
                         {{ __('Cleaning Service') }}
                     </flux:navlist.item>
-                    @endrole
+                    @endcan
 
-                    @role(['admin', 'receptionist', 'chef'])
+                    @can('view-menu-service')
                     <flux:navlist.item 
                         icon="rectangle-group" 
                         :href="route('menuService.index')" 
                         :current="request()->routeIs('menuService.index')" >
                         {{ __('Menu Service') }}
                     </flux:navlist.item>
-                    @endrole
+                    @endcan
                     
-                    @role(['admin', 'receptionist'])
+                    @can('view-calendar')
                     <flux:navlist.item 
                         icon="calendar" 
                         :href="route('calendar.index')" 
                         :current="request()->routeIs('calendar.index')" >
                         {{ __('Room Calendar') }}
                     </flux:navlist.item>
-                    @endrole
+                    @endcan
 
-                    @role('admin')
                     <flux:navlist.group :heading="__('Roles & Permissions')" class="grid">
                         @can('manage-roles')
                         <flux:navlist.item icon="shield-check" :href="route('roles.index')" :current="request()->routeIs('roles.index')">{{ __('Manage Roles') }}</flux:navlist.item>
                         @endcan
-                       
                     </flux:navlist.group>
-                    @endrole
 
-                       @role('admin')
                     <flux:navlist.group :heading="__('User Management')" class="grid">
                         @can('manage-users')
                         <flux:navlist.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.*')">{{ __('Manage Users') }}</flux:navlist.item>
                         @endcan
                     </flux:navlist.group>
-                    @endrole
                     
                 </flux:navlist.group>
                 

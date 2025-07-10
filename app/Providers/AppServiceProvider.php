@@ -7,6 +7,7 @@ use App\Models\RoomMenuOrder;
 use App\Observers\RoomObserver;
 use App\Observers\RoomMenuOrderObserver;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +24,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register pagination theme for Livewire components
+        \Livewire\Component::macro('paginationView', function () {
+            return 'pagination.tailwind';
+        });
+        
         // Register the Room observer to handle automatic cleaning status changes
         Room::observe(RoomObserver::class);
         

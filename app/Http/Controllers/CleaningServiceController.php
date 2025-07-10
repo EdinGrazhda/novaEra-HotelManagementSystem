@@ -47,7 +47,7 @@ class CleaningServiceController extends Controller
             });
         }
         
-        $cleaning = $query->get();
+        $cleaning = $query->paginate(10);
         
         return view('cleaning.index', compact(
             'cleaning', 

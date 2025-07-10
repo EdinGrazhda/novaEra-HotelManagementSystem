@@ -137,7 +137,8 @@ class RoomController extends Controller
             });
         }
         
-        $rooms = $query->get();
+        
+        $rooms = $query->paginate(10)->withQueryString();
         
         return view('rooms.index', compact(
             'rooms', 

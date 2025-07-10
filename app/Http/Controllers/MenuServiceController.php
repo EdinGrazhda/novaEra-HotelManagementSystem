@@ -7,14 +7,27 @@ use App\Models\Room;
 use App\Models\RoomMenuOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class MenuServiceController extends Controller
 {
+    /**
+     * Constructor to apply authorization middleware
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     /**
      * Display the livewire version of the menu service.
      */
     public function livewireIndex()
     {
+        if (Gate::denies('view-menu-service')) {
+            abort(403, 'Unauthorized action.');
+        }
+        
         return view('menuService.livewire-index');
     }
     
@@ -23,6 +36,10 @@ class MenuServiceController extends Controller
      */
     public function index(Request $request)
     {
+        if (Gate::denies('view-menu-service')) {
+            abort(403, 'Unauthorized action.');
+        }
+        
         $rooms = Room::all();
         $menu_items = Menu::all();
         $orders = RoomMenuOrder::with(['room', 'menu'])
@@ -40,9 +57,14 @@ class MenuServiceController extends Controller
                     $q->where('room_number', 'like', "%{$search}%");
                 });
             })
-            ->get();
+            ->paginate(10);
 
-        return view('menuService.index', compact('rooms', 'menu_items', 'orders'));
+        // Keep pagination when filters are applied
+        return view('menuService.index', compact('rooms', 'menu_items', 'orders'))->with([
+            'status_filter' => $request->status_filter,
+            'room_filter' => $request->room_filter,
+            'search' => $request->search,
+        ]);
     }
 
     /**

@@ -101,6 +101,11 @@
                         @endforeach
                     </tbody>
                 </table>
+                
+                <!-- Pagination Links for Roles -->
+                <div class="px-6 py-4">
+                    {{ $roles->links() }}
+                </div>
             </div>
         </div>
 

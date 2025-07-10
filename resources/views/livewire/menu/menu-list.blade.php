@@ -68,6 +68,10 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- Pagination Links -->
+                <div class="mt-4 px-4 py-2">
+                    {{ $menus->links() }}
+                </div>
             @else
                 <div class="text-center py-10">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

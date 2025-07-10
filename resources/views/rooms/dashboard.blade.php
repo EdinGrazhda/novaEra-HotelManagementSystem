@@ -1,4 +1,4 @@
-<x-layouts.app :title="__('Room Management')">
+{{-- <x-layouts.app :title="__('Room Management')">
 <style>
     .chart-loading {
         display: flex;
@@ -729,4 +729,4 @@
     }, 1000);
 </script>
 
-</x-layouts.app>
+</x-layouts.app> --}}
