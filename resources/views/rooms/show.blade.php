@@ -1,25 +1,51 @@
 <x-layouts.app :title="__('Show Room Details')">
 <div class="container mx-auto px-4 py-8">
     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div class="bg-[#F8B803] p-6 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-semibold text-[#1B1B18]">Room {{ $room->room_number }} Details</h1>
-                <p class="text-[#1B1B18] opacity-80">
-                    {{ ucfirst($room->room_type) }} Room | Floor {{ $room->room_floor }} | 
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                        {{ $room->room_status == 'available' ? 'bg-green-100 text-green-800' : 
-                        ($room->room_status == 'occupied' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
-                        {{ ucfirst($room->room_status) }}
-                    </span>
-                </p>
+        <div class="bg-[#F8B803] p-4 md:p-6">
+            <!-- Mobile layout (stacked) -->
+            <div class="flex flex-col space-y-4 md:hidden">
+                <div>
+                    <h1 class="text-xl font-semibold text-[#1B1B18]">Room {{ $room->room_number }} Details</h1>
+                    <p class="text-[#1B1B18] opacity-80 text-sm">
+                        {{ ucfirst($room->room_type) }} Room | Floor {{ $room->room_floor }} | 
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                            {{ $room->room_status == 'available' ? 'bg-green-100 text-green-800' : 
+                            ($room->room_status == 'occupied' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
+                            {{ ucfirst($room->room_status) }}
+                        </span>
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <a href="{{ route('rooms.edit', $room) }}" class="px-3 py-1.5 bg-white text-[#1B1B18] text-sm font-medium rounded-md hover:bg-gray-100 transition duration-200 flex items-center">
+                        <i class="fas fa-edit mr-1.5"></i> Edit
+                    </a>
+                    <a href="{{ route('rooms.index') }}" class="px-3 py-1.5 bg-white text-[#1B1B18] text-sm font-medium rounded-md hover:bg-gray-100 transition duration-200 flex items-center">
+                        <i class="fas fa-arrow-left mr-1.5"></i> Back
+                    </a>
+                </div>
             </div>
-            <div class="flex space-x-2">
-                <a href="{{ route('rooms.edit', $room) }}" class="px-4 py-2 bg-white text-[#1B1B18] font-medium rounded-md hover:bg-gray-100 transition duration-200 flex items-center">
-                    <i class="fas fa-edit mr-2"></i> Edit
-                </a>
-                <a href="{{ route('rooms.index') }}" class="px-4 py-2 bg-white text-[#1B1B18] font-medium rounded-md hover:bg-gray-100 transition duration-200 flex items-center">
-                    <i class="fas fa-arrow-left mr-2"></i> Back to Rooms
-                </a>
+            
+            <!-- Desktop layout (side by side) -->
+            <div class="hidden md:flex md:justify-between md:items-center">
+                <div>
+                    <h1 class="text-2xl font-semibold text-[#1B1B18]">Room {{ $room->room_number }} Details</h1>
+                    <p class="text-[#1B1B18] opacity-80">
+                        {{ ucfirst($room->room_type) }} Room | Floor {{ $room->room_floor }} | 
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                            {{ $room->room_status == 'available' ? 'bg-green-100 text-green-800' : 
+                            ($room->room_status == 'occupied' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
+                            {{ ucfirst($room->room_status) }}
+                        </span>
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+                    <a href="{{ route('rooms.edit', $room) }}" class="px-4 py-2 bg-white text-[#1B1B18] font-medium rounded-md hover:bg-gray-100 transition duration-200 flex items-center">
+                        <i class="fas fa-edit mr-2"></i> Edit
+                    </a>
+                    <a href="{{ route('rooms.index') }}" class="px-4 py-2 bg-white text-[#1B1B18] font-medium rounded-md hover:bg-gray-100 transition duration-200 flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Rooms
+                    </a>
+                </div>
             </div>
         </div>
         
@@ -186,30 +212,30 @@
                             
                             <div class="flex flex-wrap gap-2">
                                 @if($room->checkin_status != 'checked_in')
-                                    <form action="{{ route('rooms.checkIn', $room) }}" method="POST">
+                                    <form action="{{ route('rooms.checkIn', $room) }}" method="POST" class="w-full sm:w-auto">
                                         @csrf
                                         @method('PATCH')
-                                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition duration-200 flex items-center">
+                                        <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition duration-200 flex items-center justify-center">
                                             <i class="fas fa-sign-in-alt mr-2"></i> Check-in
                                         </button>
                                     </form>
                                 @else
-                                    <button disabled class="px-4 py-2 bg-gray-400 text-white font-medium rounded-md cursor-not-allowed flex items-center">
-                                        <i class="fas fa-sign-in-alt mr-2"></i> Already Checked-in
+                                    <button disabled class="w-full sm:w-auto px-4 py-2 bg-gray-400 text-white font-medium rounded-md cursor-not-allowed flex items-center justify-center">
+                                        <i class="fas fa-sign-in-alt mr-2"></i> <span class="whitespace-nowrap">Already Checked-in</span>
                                     </button>
                                 @endif
                                 
                                 @if($room->checkin_status == 'checked_in' && $room->checkout_status != 'checked_out')
-                                    <form action="{{ route('rooms.checkOut', $room) }}" method="POST">
+                                    <form action="{{ route('rooms.checkOut', $room) }}" method="POST" class="w-full sm:w-auto">
                                         @csrf
                                         @method('PATCH')
-                                        <button type="submit" class="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition duration-200 flex items-center">
+                                        <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition duration-200 flex items-center justify-center">
                                             <i class="fas fa-sign-out-alt mr-2"></i> Check-out
                                         </button>
                                     </form>
                                 @elseif($room->checkout_status == 'checked_out')
-                                    <button disabled class="px-4 py-2 bg-gray-400 text-white font-medium rounded-md cursor-not-allowed flex items-center">
-                                        <i class="fas fa-sign-out-alt mr-2"></i> Already Checked-out
+                                    <button disabled class="w-full sm:w-auto px-4 py-2 bg-gray-400 text-white font-medium rounded-md cursor-not-allowed flex items-center justify-center">
+                                        <i class="fas fa-sign-out-alt mr-2"></i> <span class="whitespace-nowrap">Already Checked-out</span>
                                     </button>
                                 @endif
                             </div>
@@ -224,13 +250,13 @@
                             
                             <div class="space-y-2">
                                 @if($room->room_status == 'available')
-                                    <div class="flex gap-2">
+                                    <div class="flex flex-col sm:flex-row gap-2">
                                         <form action="{{ route('rooms.updateStatus', $room) }}" method="POST" class="flex-1">
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="room_status" value="occupied">
                                             <button type="submit" class="w-full px-3 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition duration-200 flex items-center justify-center">
-                                                <i class="fas fa-user-check mr-2"></i> Mark as Occupied
+                                                <i class="fas fa-user-check mr-2"></i> <span class="whitespace-nowrap">Mark as Occupied</span>
                                             </button>
                                         </form>
                                         
@@ -239,18 +265,18 @@
                                             @method('PATCH')
                                             <input type="hidden" name="room_status" value="maintenance">
                                             <button type="submit" class="w-full px-3 py-2 bg-gray-600 text-white font-medium rounded-md hover:bg-gray-700 transition duration-200 flex items-center justify-center">
-                                                <i class="fas fa-tools mr-2"></i> Mark for Maintenance
+                                                <i class="fas fa-tools mr-2"></i> <span class="whitespace-nowrap">Mark for Maintenance</span>
                                             </button>
                                         </form>
                                     </div>
                                 @elseif($room->room_status == 'occupied')
-                                    <div class="flex gap-2">
+                                    <div class="flex flex-col sm:flex-row gap-2">
                                         <form action="{{ route('rooms.updateStatus', $room) }}" method="POST" class="flex-1">
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="room_status" value="available">
                                             <button type="submit" class="w-full px-3 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition duration-200 flex items-center justify-center">
-                                                <i class="fas fa-check-circle mr-2"></i> Mark as Available
+                                                <i class="fas fa-check-circle mr-2"></i> <span class="whitespace-nowrap">Mark as Available</span>
                                             </button>
                                         </form>
                                         
@@ -259,18 +285,18 @@
                                             @method('PATCH')
                                             <input type="hidden" name="room_status" value="maintenance">
                                             <button type="submit" class="w-full px-3 py-2 bg-gray-600 text-white font-medium rounded-md hover:bg-gray-700 transition duration-200 flex items-center justify-center">
-                                                <i class="fas fa-tools mr-2"></i> Mark for Maintenance
+                                                <i class="fas fa-tools mr-2"></i> <span class="whitespace-nowrap">Mark for Maintenance</span>
                                             </button>
                                         </form>
                                     </div>
                                 @elseif($room->room_status == 'maintenance')
-                                    <div class="flex gap-2">
+                                    <div class="flex flex-col sm:flex-row gap-2">
                                         <form action="{{ route('rooms.updateStatus', $room) }}" method="POST" class="flex-1">
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="room_status" value="available">
                                             <button type="submit" class="w-full px-3 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition duration-200 flex items-center justify-center">
-                                                <i class="fas fa-check-circle mr-2"></i> Mark as Available
+                                                <i class="fas fa-check-circle mr-2"></i> <span class="whitespace-nowrap">Mark as Available</span>
                                             </button>
                                         </form>
                                         
@@ -279,7 +305,7 @@
                                             @method('PATCH')
                                             <input type="hidden" name="room_status" value="occupied">
                                             <button type="submit" class="w-full px-3 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition duration-200 flex items-center justify-center">
-                                                <i class="fas fa-user-check mr-2"></i> Mark as Occupied
+                                                <i class="fas fa-user-check mr-2"></i> <span class="whitespace-nowrap">Mark as Occupied</span>
                                             </button>
                                         </form>
                                     </div>
@@ -297,53 +323,55 @@
                                 Cleaning Status
                             </h3>
                             
-                            <div class="grid grid-cols-3 gap-2 mb-4">
-                                <form action="{{ route('rooms.updateCleaningStatus', $room) }}" method="POST">
+                            <div class="grid grid-cols-1 xs:grid-cols-3 gap-2 mb-4">
+                                <form action="{{ route('rooms.updateCleaningStatus', $room) }}" method="POST" class="w-full">
                                     @csrf
                                     @method('PATCH')
                                     <input type="hidden" name="cleaning_status" value="clean">
-                                    <button type="submit" class="w-full px-2 py-2 {{ $room->cleaning_status == 'clean' ? 'bg-green-700' : 'bg-green-600' }} text-white font-medium rounded-md hover:bg-green-700 transition duration-200 flex flex-col items-center justify-center">
-                                        <i class="fas fa-check-circle text-lg mb-1"></i> 
-                                        <span class="text-xs">Clean</span>
+                                    <button type="submit" class="w-full px-2 py-2 {{ $room->cleaning_status == 'clean' ? 'bg-green-700' : 'bg-green-600' }} text-white font-medium rounded-md hover:bg-green-700 transition duration-200 flex items-center justify-center sm:flex-col">
+                                        <i class="fas fa-check-circle text-lg sm:mb-1 mr-2 sm:mr-0"></i> 
+                                        <span class="text-sm sm:text-xs">Clean</span>
                                     </button>
                                 </form>
                                 
-                                <form action="{{ route('rooms.updateCleaningStatus', $room) }}" method="POST">
+                                <form action="{{ route('rooms.updateCleaningStatus', $room) }}" method="POST" class="w-full">
                                     @csrf
                                     @method('PATCH')
                                     <input type="hidden" name="cleaning_status" value="in_progress">
-                                    <button type="submit" class="w-full px-2 py-2 {{ $room->cleaning_status == 'in_progress' ? 'bg-yellow-700' : 'bg-yellow-600' }} text-white font-medium rounded-md hover:bg-yellow-700 transition duration-200 flex flex-col items-center justify-center">
-                                        <i class="fas fa-clock text-lg mb-1"></i>
-                                        <span class="text-xs">In Progress</span>
+                                    <button type="submit" class="w-full px-2 py-2 {{ $room->cleaning_status == 'in_progress' ? 'bg-yellow-700' : 'bg-yellow-600' }} text-white font-medium rounded-md hover:bg-yellow-700 transition duration-200 flex items-center justify-center sm:flex-col">
+                                        <i class="fas fa-clock text-lg sm:mb-1 mr-2 sm:mr-0"></i>
+                                        <span class="text-sm sm:text-xs">In Progress</span>
                                     </button>
                                 </form>
                                 
-                                <form action="{{ route('rooms.updateCleaningStatus', $room) }}" method="POST">
+                                <form action="{{ route('rooms.updateCleaningStatus', $room) }}" method="POST" class="w-full">
                                     @csrf
                                     @method('PATCH')
                                     <input type="hidden" name="cleaning_status" value="not_cleaned">
-                                    <button type="submit" class="w-full px-2 py-2 {{ $room->cleaning_status == 'not_cleaned' ? 'bg-red-700' : 'bg-red-600' }} text-white font-medium rounded-md hover:bg-red-700 transition duration-200 flex flex-col items-center justify-center">
-                                        <i class="fas fa-times-circle text-lg mb-1"></i>
-                                        <span class="text-xs">Not Cleaned</span>
+                                    <button type="submit" class="w-full px-2 py-2 {{ $room->cleaning_status == 'not_cleaned' ? 'bg-red-700' : 'bg-red-600' }} text-white font-medium rounded-md hover:bg-red-700 transition duration-200 flex items-center justify-center sm:flex-col">
+                                        <i class="fas fa-times-circle text-lg sm:mb-1 mr-2 sm:mr-0"></i>
+                                        <span class="text-sm sm:text-xs">Not Cleaned</span>
                                     </button>
                                 </form>
                             </div>
                             
-                            <form action="{{ route('rooms.updateCleaningStatus', $room) }}" method="POST">
+                            <form action="{{ route('rooms.updateCleaningStatus', $room) }}" method="POST" class="mt-3">
                                 @csrf
                                 @method('PATCH')
                                 <input type="hidden" name="cleaning_status" value="{{ $room->cleaning_status ?? 'clean' }}">
                                 <div class="flex flex-col">
-                                    <label for="cleaning_notes" class="mb-1 text-sm font-medium text-gray-700">Cleaning Notes:</label>
-                                    <div class="flex">
-                                        <input type="text" id="cleaning_notes" name="cleaning_notes" placeholder="Add cleaning notes..." 
-                                               class="flex-grow px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-[#F8B803]"
-                                               value="{{ $room->cleaning_notes }}">
-                                        <button type="submit" class="px-4 py-2 bg-[#F8B803] text-[#1B1B18] rounded-r-md hover:bg-yellow-500">
-                                            <i class="fas fa-save"></i>
-                                        </button>
+                                    <div class="flex flex-col xs:flex-row xs:items-center mb-1">
+                                        <label for="cleaning_notes" class="text-xs font-medium text-gray-700 mb-1 xs:mb-0 xs:mr-2">Cleaning Notes:</label>
+                                        <div class="flex flex-1">
+                                            <input type="text" id="cleaning_notes" name="cleaning_notes" placeholder="Add notes..." 
+                                                   class="flex-1 px-2 py-1 text-xs border border-gray-300 rounded-l-md focus:outline-none focus:ring-1 focus:ring-[#F8B803] w-full"
+                                                   value="{{ $room->cleaning_notes }}">
+                                            <button type="submit" class="px-2 py-1 bg-[#F8B803] text-[#1B1B18] rounded-r-md hover:bg-yellow-500">
+                                                <i class="fas fa-save text-sm"></i>
+                                            </button>
+                                        </div>
                                     </div>
-                                    <p class="text-xs text-gray-500 mt-1">Add any special cleaning instructions or notes here.</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">Add cleaning instructions here</p>
                                 </div>
                             </form>
                         </div>

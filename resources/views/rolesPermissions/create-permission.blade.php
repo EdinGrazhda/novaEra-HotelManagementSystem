@@ -1,9 +1,9 @@
 <x-layouts.app :title="__('Roles and Permissions Management')">
     <div class="container mx-auto px-4 py-8">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">Create New Permission</h1>
-            <a href="{{ route('roles.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
-                <i class="fas fa-arrow-left mr-2"></i> Back to Permissions
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-6">
+            <h1 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">Create New Permission</h1>
+            <a href="{{ route('roles.index') }}" class="bg-gray-500 text-white px-3 py-2 rounded-md hover:bg-gray-600 text-sm sm:text-base flex items-center whitespace-nowrap">
+                <i class="fas fa-arrow-left mr-1 sm:mr-2 flex-shrink-0"></i> Back to Roles
             </a>
         </div>        <!-- Flash messages -->
         @if(session('error'))

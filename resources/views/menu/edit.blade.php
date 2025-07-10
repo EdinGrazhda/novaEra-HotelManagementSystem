@@ -1,9 +1,9 @@
 <x-layouts.app :title="__('Edit Menu')">
     <div class="container mx-auto px-4 py-8">
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold text-[#1B1B18]">Edit Menu Item</h1>
-            <a href="{{ route('menu.index') }}" class="px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 transition duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-6">
+            <h1 class="text-xl sm:text-2xl font-bold text-[#1B1B18]">Edit Menu Item</h1>
+            <a href="{{ route('menu.index') }}" class="px-3 py-2 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 transition duration-200 flex items-center whitespace-nowrap text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0 mr-1" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                 </svg>
                 Back to Menu List
@@ -46,8 +46,8 @@
                     </div>
                     
                     <!-- Submit Button -->
-                    <div class="flex items-center justify-end">
-                        <button type="submit" class="px-6 py-2 bg-[#F8B803] text-[#1B1B18] font-medium rounded-md hover:bg-yellow-500 transition duration-200">
+                    <div class="flex items-center sm:justify-end">
+                        <button type="submit" class="w-full sm:w-auto px-4 sm:px-6 py-2 bg-[#F8B803] text-[#1B1B18] font-medium rounded-md hover:bg-yellow-500 transition duration-200">
                             Update Menu Item
                         </button>
                     </div>

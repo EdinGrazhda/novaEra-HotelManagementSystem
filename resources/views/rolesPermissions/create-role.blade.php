@@ -1,11 +1,11 @@
 <x-layouts.app :title="__('Role Management')">
     <div class="container mx-auto px-4 py-8">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">Create New Role</h1>
-            <a href="{{ route('roles.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
-                <i class="fas fa-arrow-left mr-2"></i> Back to Roles
+       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-6">
+            <h1 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">Create New Role</h1>
+            <a href="{{ route('roles.index') }}" class="bg-gray-500 text-white px-3 py-2 rounded-md hover:bg-gray-600 text-sm sm:text-base flex items-center whitespace-nowrap">
+                <i class="fas fa-arrow-left mr-1 sm:mr-2 flex-shrink-0"></i> Back to Roles
             </a>
-        </div>        <!-- Flash messages -->
+        </div>         <!-- Flash messages -->
         @if(session('error'))
         <div id="error-alert" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
             <span class="block sm:inline">{{ session('error') }}</span>
