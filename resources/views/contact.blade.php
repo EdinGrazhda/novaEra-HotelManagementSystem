@@ -400,7 +400,7 @@
                             </div>
                             <div class="info-content">
                                 <h3>Email</h3>
-                                <p>info@novaera-hms.com</p>
+                                <p>info@novaera-ks.com</p>
                             </div>
                         </div>
                         
@@ -548,7 +548,7 @@
                         <ul class="footer-links">
                             <li><i class="fas fa-map-marker-alt"></i> Kosovo , Prizren</li>
                             <li><i class="fas fa-phone"></i> +383 49821554</li>
-                            <li><i class="fas fa-envelope"></i> info@novaera-hms.com</li>
+                            <li><i class="fas fa-envelope"></i> info@novaera-ks.com</li>
                             <li><a href="{{ route('contact.index') }}" class="contact-link"><i class="fas fa-paper-plane"></i> Contact Us</a></li>
                         </ul>
                     </div>
