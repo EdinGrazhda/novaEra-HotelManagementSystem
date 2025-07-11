@@ -362,7 +362,7 @@
             <div class="flex flex-col md:flex-row items-center justify-between">
                 <div class="mb-6 md:mb-0">
                     <div class="flex items-center mb-3">
-                        <img src="{{ asset('favicon.svg') }}" alt="NovaERA Logo" class="h-10 w-auto mr-3">
+                        <img src="{{ asset('images/logohms.png') }}" alt="NovaERA Logo" class="h-10 w-auto mr-3">
                         <div>
                             <h3 class="font-semibold text-gray-800">NovaERA HMS</h3>
                             <p class="text-xs text-gray-500">Hotel Management Excellence</p>
