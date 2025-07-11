@@ -98,11 +98,19 @@
             </a>
 
             <flux:navlist variant="outline">
+                @php
+                $hasPlatformItems = auth()->user()->can('view-dashboard') || auth()->user()->can('view-rooms') || auth()->user()->can('view-menu');
+                @endphp
+
+                @if($hasPlatformItems)
                 <flux:navlist.group :heading="__('Platform')">
+                    @can('view-dashboard')
                     <flux:navlist.item icon="layout-grid" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                       {{ __('Dashboard') }}
                     </flux:navlist.item>
+                    @endcan
                 </flux:navlist.group>
+                @endif
             </flux:navlist>
 
             <flux:spacer />

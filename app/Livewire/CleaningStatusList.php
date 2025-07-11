@@ -25,7 +25,7 @@ class CleaningStatusList extends Component
         $this->cleaningFilter = $cleaningFilter;
         $this->searchQuery = $searchQuery;
         
-        // Update URL parameters on mount
+    
         $this->dispatch('urlChanged', [
             'cleaningFilter' => $this->cleaningFilter !== 'all' ? $this->cleaningFilter : null,
             'searchQuery' => !empty($this->searchQuery) ? $this->searchQuery : null
@@ -34,7 +34,7 @@ class CleaningStatusList extends Component
     
     public function updatedCleaningFilter()
     {
-        // Reset pagination when filter changes
+    
         $this->resetPage();
         
         $this->dispatch('filterChanged');

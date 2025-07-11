@@ -190,170 +190,108 @@
         @endcan
 
         <!-- Current Orders -->
-        <div class="mb-4">
-            <h2 class="text-xl font-semibold mb-4">Current Orders</h2>
-            
-            @if($orders->count() > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @foreach($orders as $order)
-                        <div class="menu-service-card p-4 {{ 'status-' . $order->status }}">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-bold">Room {{ $order->room->room_number }}</h3>
-                                <span class="px-2 py-1 text-xs font-medium rounded-full {{ $order->status_color }}">
-                                    {{ $order->status_label }}
-                                </span>
-                            </div>
-                            <div class="mb-3">
-                                <p class="font-medium">{{ $order->menu->name }}</p>
-                                <p class="text-sm text-gray-600">{{ $order->menu->description }}</p>
-                                <p class="mt-1">
-                                    <span class="font-medium">Quantity:</span> {{ $order->quantity }}
-                                </p>
-                                @if($order->notes)
-                                    <p class="mt-2 text-sm italic">
-                                        <span class="font-medium">Notes:</span> {{ $order->notes }}
-                                    </p>
-                                @endif
-                            </div>
-                            <div class="flex justify-between items-center text-xs text-gray-500">
-                                <span>Ordered: {{ $order->created_at->format('M d, g:i A') }}</span>
-                                
-                                <div class="flex gap-1">
-                                    <form action="{{ route('menuService.updateStatus', $order) }}" method="POST" class="inline">
-                                        @csrf
-                                        @method('PATCH')
-                                        @if($order->status === 'received')
-                                            <input type="hidden" name="status" value="in_process">
-                                            <button type="submit" class="px-2 py-1 bg-yellow-500 text-white text-xs rounded hover:bg-yellow-600">
-                                                Start Preparing
-                                            </button>
-                                        @elseif($order->status === 'in_process')
-                                            <input type="hidden" name="status" value="delivered">
-                                            <button type="submit" class="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600">
-                                                Mark Delivered
-                                            </button>
-                                        @endif
-                                    </form>
-                                    
-                                    @can('create-menu-order')
-                                    <form action="{{ route('menuService.destroy', $order) }}" method="POST" class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" onclick="return confirm('Are you sure you want to cancel this order?')" class="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600">
-                                            Cancel
-                                        </button>
-                                    </form>
-                                    @endcan
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-                
-                <!-- Pagination -->
-                <div class="mt-4 px-4 py-2 bg-white rounded-lg shadow-md">
-                    {{ $orders->appends(request()->except('page'))->links() }}
-                </div>
-            @else
-                <div class="text-center py-8 bg-white rounded-lg shadow">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <h3 class="text-lg font-medium text-gray-900">No orders found</h3>
-                    <p class="text-gray-500 mt-2">Start by creating a new food order above.</p>
-                </div>
-            @endif
-        </div>
+        <livewire:real-time-menu-service :room-filter="request('room_filter')" :status-filter="request('status_filter')" :search="request('search')" />
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Handle filter form submission
             const form = document.querySelector('.menu-filter-form');
-            const searchInput = form.querySelector('input[name="search"]');
-            
-            // Handle filter button clicks
-            document.querySelectorAll('button[name="status_filter"]').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Get the value
-                    const value = this.getAttribute('value');
-                    
-                    // Create or update form parameters
-                    const formData = new FormData(form);
-                    formData.set('status_filter', value);
-                    
-                    // Build the URL with all parameters
-                    let url = form.action + '?';
-                    for (const [key, val] of formData.entries()) {
-                        if (val) {
-                            url += encodeURIComponent(key) + '=' + encodeURIComponent(val) + '&';
+            if (form) {
+                const searchInput = form.querySelector('input[name="search"]');
+                
+                // Handle filter button clicks
+                document.querySelectorAll('button[name="status_filter"]').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // Get the value
+                        const value = this.getAttribute('value');
+                        
+                        // Create or update form parameters
+                        const formData = new FormData(form);
+                        formData.set('status_filter', value);
+                        
+                        // Build the URL with all parameters
+                        let url = form.action + '?';
+                        for (const [key, val] of formData.entries()) {
+                            if (val) {
+                                url += encodeURIComponent(key) + '=' + encodeURIComponent(val) + '&';
+                            }
                         }
-                    }
-                    
-                    // Navigate to the filtered URL
-                    window.location.href = url.slice(0, -1);  // Remove trailing &
+                        
+                        // Navigate to the filtered URL
+                        window.location.href = url.slice(0, -1);  // Remove trailing &
+                    });
                 });
-            });            // Handle menu item checkboxes to show/hide quantity controls
-            document.querySelectorAll('.menu-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const menuItem = this.closest('.menu-item');
-                    const quantityControl = menuItem.querySelector('.quantity-control');
-                    const menuIdInput = menuItem.querySelector('.menu-id-input');
-                    const quantityInput = menuItem.querySelector('.quantity-input');
-                    
-                    if (this.checked) {
-                        quantityControl.classList.remove('hidden');
-                        menuIdInput.disabled = false;
-                        quantityInput.disabled = false;
-                    } else {
-                        quantityControl.classList.add('hidden');
-                        menuIdInput.disabled = true;
-                        quantityInput.disabled = true;
-                    }
+            }            // Handle menu item checkboxes to show/hide quantity controls
+            const checkboxes = document.querySelectorAll('.menu-checkbox');
+            if (checkboxes.length > 0) {
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        const menuItem = this.closest('.menu-item');
+                        const quantityControl = menuItem.querySelector('.quantity-control');
+                        const menuIdInput = menuItem.querySelector('.menu-id-input');
+                        const quantityInput = menuItem.querySelector('.quantity-input');
+                        
+                        if (this.checked) {
+                            quantityControl.classList.remove('hidden');
+                            menuIdInput.disabled = false;
+                            quantityInput.disabled = false;
+                        } else {
+                            quantityControl.classList.add('hidden');
+                            menuIdInput.disabled = true;
+                            quantityInput.disabled = true;
+                        }
+                    });
                 });
-            });
+            }
 
             // Handle quantity increase/decrease buttons
-            document.querySelectorAll('.quantity-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const itemId = this.dataset.id;
-                    const input = this.parentNode.querySelector('.quantity-input');
-                    let value = parseInt(input.value);
-                    
-                    if (this.classList.contains('increase')) {
-                        if (value < parseInt(input.getAttribute('max'))) {
-                            input.value = value + 1;
+            const quantityButtons = document.querySelectorAll('.quantity-btn');
+            if (quantityButtons.length > 0) {
+                quantityButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const itemId = this.dataset.id;
+                        const input = this.parentNode.querySelector('.quantity-input');
+                        let value = parseInt(input.value);
+                        
+                        if (this.classList.contains('increase')) {
+                            if (value < parseInt(input.getAttribute('max'))) {
+                                input.value = value + 1;
+                            }
+                        } else {
+                            if (value > parseInt(input.getAttribute('min'))) {
+                                input.value = value - 1;
+                            }
                         }
-                    } else {
-                        if (value > parseInt(input.getAttribute('min'))) {
-                            input.value = value - 1;
-                        }
-                    }
+                    });
                 });
-            });            // Form validation before submission
-            document.getElementById('orderForm').addEventListener('submit', function(e) {
-                const checkedItems = document.querySelectorAll('.menu-checkbox:checked');
-                if (checkedItems.length === 0) {
-                    e.preventDefault();
-                    alert('Please select at least one menu item.');
-                    return;
-                }
-                
-                // Additional validation to ensure the form data structure is correct
-                checkedItems.forEach(item => {
-                    const itemId = item.dataset.id;
-                    const menuIdInput = document.querySelector(`input[name="menu_items[${itemId}][menu_id]"]`);
-                    const quantityInput = document.querySelector(`input[name="menu_items[${itemId}][quantity]"]`);
+            }            // Form validation before submission
+            const orderForm = document.getElementById('orderForm');
+            if (orderForm) {
+                orderForm.addEventListener('submit', function(e) {
+                    const checkedItems = document.querySelectorAll('.menu-checkbox:checked');
+                    if (checkedItems.length === 0) {
+                        e.preventDefault();
+                        alert('Please select at least one menu item.');
+                        return;
+                    }
                     
-                    // Make sure the inputs are enabled for selected items
+                    // Additional validation to ensure the form data structure is correct
+                    checkedItems.forEach(item => {
+                        const itemId = item.dataset.id;
+                        const menuIdInput = document.querySelector(`input[name="menu_items[${itemId}][menu_id]"]`);
+                        const quantityInput = document.querySelector(`input[name="menu_items[${itemId}][quantity]"]`);
+                        
+                        // Make sure the inputs are enabled for selected items
                     if (menuIdInput && quantityInput) {
                         menuIdInput.disabled = false;
                         quantityInput.disabled = false;
                     }
                 });
             });
+            }
         });
     </script>
 </x-layouts.app>

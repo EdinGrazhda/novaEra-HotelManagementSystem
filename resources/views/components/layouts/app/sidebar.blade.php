@@ -12,6 +12,17 @@
             </a>
 
             <flux:navlist variant="outline">
+                @php
+                // For cleaner role, don't show Platform heading even if they have dashboard access
+                if (auth()->user()->hasRole('cleaner')) {
+                    $hasPlatformItems = false;
+                } else {
+                    $hasPlatformItems = auth()->user()->can('view-dashboard') || auth()->user()->can('view-rooms') || auth()->user()->can('view-menu');
+                }
+                $hasServiceItems = auth()->user()->can('view-cleaning') || auth()->user()->can('view-menu-service') || auth()->user()->can('view-calendar');
+                @endphp
+
+                @if($hasPlatformItems)
                 <flux:navlist.group :heading="__('Platform')" class="grid">
                     @can('view-dashboard')
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
@@ -25,7 +36,9 @@
                     <flux:navlist.item icon="squares-plus" :href="route('menu.index')" :current="request()->routeIs('menu.index')" wire:navigate>{{ __('Menu') }}</flux:navlist.item>
                     @endcan
                 </flux:navlist.group>
+                @endif
                 
+                @if($hasServiceItems)
                 <flux:navlist.group :heading="__('Services')" class="grid">
                     @can('view-cleaning')
                     <flux:navlist.item 
@@ -55,20 +68,20 @@
                         {{ __('Room Calendar') }}
                     </flux:navlist.item>
                     @endcan
-
-                    <flux:navlist.group :heading="__('Roles & Permissions')" class="grid">
-                        @can('manage-roles')
-                        <flux:navlist.item icon="shield-check" :href="route('roles.index')" :current="request()->routeIs('roles.index')">{{ __('Manage Roles') }}</flux:navlist.item>
-                        @endcan
-                    </flux:navlist.group>
-
-                    <flux:navlist.group :heading="__('User Management')" class="grid">
-                        @can('manage-users')
-                        <flux:navlist.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.*')">{{ __('Manage Users') }}</flux:navlist.item>
-                        @endcan
-                    </flux:navlist.group>
-                    
                 </flux:navlist.group>
+                @endif
+
+                @if(auth()->user()->can('manage-roles'))
+                <flux:navlist.group :heading="__('Roles & Permissions')" class="grid">
+                    <flux:navlist.item icon="shield-check" :href="route('roles.index')" :current="request()->routeIs('roles.index')">{{ __('Manage Roles') }}</flux:navlist.item>
+                </flux:navlist.group>
+                @endif
+
+                @if(auth()->user()->can('manage-users'))
+                <flux:navlist.group :heading="__('User Management')" class="grid">
+                    <flux:navlist.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.*')">{{ __('Manage Users') }}</flux:navlist.item>
+                </flux:navlist.group>
+                @endif
                 
             </flux:navlist>
 

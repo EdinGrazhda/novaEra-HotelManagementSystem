@@ -17,26 +17,29 @@ class RealTimeMenuService extends Component
     // Use Tailwind theme for pagination
     protected $paginationTheme = 'tailwind';
     
-    public $rooms;
-    public $menuItems;
-    public $orders;
     public $roomFilter = '';
     public $statusFilter = '';
     public $search = '';
     public $lastUpdated;
     public $pollingActive = true;
 
-    public function mount()
+    public function mount($roomFilter = null, $statusFilter = null, $search = null)
     {
-        $this->rooms = Room::all();
-        $this->menuItems = Menu::all();
-        $this->loadOrders();
+        $this->roomFilter = $roomFilter;
+        $this->statusFilter = $statusFilter;
+        $this->search = $search;
         $this->lastUpdated = now()->format('H:i:s');
     }
 
-    public function loadOrders()
+    public function poll()
     {
-        $this->orders = RoomMenuOrder::with(['room', 'menu'])
+        $this->lastUpdated = now()->format('H:i:s');
+        $this->dispatch('orders-updated', timestamp: $this->lastUpdated);
+    }
+
+    public function getOrdersProperty()
+    {
+        return RoomMenuOrder::with(['room', 'menu'])
             ->when($this->statusFilter, function($query) {
                 return $query->where('status', $this->statusFilter);
             })
@@ -55,35 +58,29 @@ class RealTimeMenuService extends Component
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
-            
-        $this->lastUpdated = now()->format('H:i:s');
-        $this->dispatch('orders-updated', timestamp: $this->lastUpdated);
     }
 
     #[On('food-order-updated')]
     public function handleOrderUpdate($orderId = null, $status = null)
     {
-        $this->loadOrders();
+        $this->poll();
     }
 
     public function setStatusFilter($value)
     {
         $this->statusFilter = $value;
         $this->resetPage(); // Reset pagination when filter changes
-        $this->loadOrders();
     }
 
     public function setRoomFilter($value)
     {
         $this->roomFilter = $value;
         $this->resetPage(); // Reset pagination when filter changes
-        $this->loadOrders();
     }
 
     public function updatedSearch()
     {
         $this->resetPage(); // Reset pagination when search changes
-        $this->loadOrders();
     }
 
     public function updateOrderStatus($orderId, $status)
@@ -98,7 +95,7 @@ class RealTimeMenuService extends Component
                 'status' => $status
             ]);
             
-            $this->loadOrders();
+            $this->poll();
         }
     }
 
@@ -107,7 +104,7 @@ class RealTimeMenuService extends Component
         $order = RoomMenuOrder::find($orderId);
         if ($order) {
             $order->delete();
-            $this->loadOrders();
+            $this->poll();
         }
     }
 
@@ -127,7 +124,7 @@ class RealTimeMenuService extends Component
             DB::commit();
             
             session()->flash('success', 'Order placed successfully!');
-            $this->loadOrders();
+            $this->poll();
             
             return true;
         } catch (\Exception $e) {
@@ -137,20 +134,27 @@ class RealTimeMenuService extends Component
         }
     }
 
-    public function poll()
-    {
-        if ($this->pollingActive) {
-            $this->loadOrders();
-        }
-    }
-
     public function togglePolling()
     {
         $this->pollingActive = !$this->pollingActive;
     }
 
+    public function getRoomsProperty()
+    {
+        return Room::all();
+    }
+
+    public function getMenuItemsProperty()
+    {
+        return Menu::all();
+    }
+
     public function render()
     {
-        return view('livewire.real-time-menu-service');
+        return view('livewire.real-time-menu-service', [
+            'orders' => $this->orders,
+            'rooms' => $this->rooms,
+            'menuItems' => $this->menuItems
+        ]);
     }
 }
