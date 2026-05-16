@@ -127,27 +127,7 @@
                 });
             }
 
-            // Handle quantity increase/decrease buttons
-            const quantityButtons = document.querySelectorAll('.quantity-btn');
-            if (quantityButtons.length > 0) {
-                quantityButtons.forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const itemId = this.dataset.id;
-                        const input = this.parentNode.querySelector('.quantity-input');
-                        let value = parseInt(input.value);
-                        
-                        if (this.classList.contains('increase')) {
-                            if (value < parseInt(input.getAttribute('max'))) {
-                                input.value = value + 1;
-                            }
-                        } else {
-                            if (value > parseInt(input.getAttribute('min'))) {
-                                input.value = value - 1;
-                            }
-                        }
-                    });
-                });
-            }            // Form validation before submission
+            // Form validation before submission
             const orderForm = document.getElementById('orderForm');
             if (orderForm) {
                 orderForm.addEventListener('submit', function(e) {
